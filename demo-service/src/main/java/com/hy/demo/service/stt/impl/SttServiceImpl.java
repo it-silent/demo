@@ -12,6 +12,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.data.querydsl.QSort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.Date;
 import java.util.List;
@@ -59,7 +60,7 @@ public class SttServiceImpl implements SttService {
 
     @Override
     public SttDO findById(Long id) {
-        sttDORepository.findAll(PageRequest.of(1, 10, Sort.by(Sort.Direction.DESC, "gmtCreate")));
+//        sttDORepository.findAll(PageRequest.of(1, 10, Sort.by(Sort.Direction.DESC, "gmtCreate")));
 
         Optional<SttDO> result = sttDORepository.findById(id);
         SttDO sttDO = result.isPresent() ? result.get() : null;
@@ -74,6 +75,26 @@ public class SttServiceImpl implements SttService {
     public List<SttDO> findAllByPageAndSort(int page, int size, Sort sort) {
         Page<SttDO> pages = sttDORepository.findAll(PageRequest.of(page, size, sort));
         return pages.getContent();
+    }
+
+    @Override
+    public void update(Long id, String name, String masterId, String leaderId) {
+        Optional<SttDO> optional = sttDORepository.findById(id);
+        SttDO sttDO = optional.isPresent() ? optional.get() : null;
+        Assert.notNull(sttDO, "数据不存在");
+
+        sttDO.setName(name);
+        sttDO.setMasterId(masterId);
+        sttDO.setMasterNick(masterId);
+        sttDO.setLeaderId(leaderId);
+        sttDO.setLeaderNick(leaderId);
+        sttDORepository.save(sttDO);
+    }
+
+    @Override
+    public void delete(Long id) {
+        Assert.notNull(id, "id must not be null");
+        sttDORepository.deleteById(id);
     }
 
 

@@ -88,6 +88,10 @@ public class BaseTest {
         return MockMvcRequestBuilders.put(url).headers(httpHeaders).contentType(MediaType.APPLICATION_JSON).content(toJsonData(requestData));
     }
 
+    protected RequestBuilder delete(String url) throws JsonProcessingException {
+        return delete(url, null);
+    }
+
     protected RequestBuilder delete(String url, Map<String, String> headers) throws JsonProcessingException {
         HttpHeaders httpHeaders = new HttpHeaders();
         if (headers != null) {

@@ -20,4 +20,8 @@ public interface SttService {
     SttDO findById(Long id);
 
     List<SttDO> findAllByPageAndSort(int page, int size, Sort sort);
+
+    void update(Long id, String name, String masterId, String leaderId);
+
+    void delete(Long id);
 }

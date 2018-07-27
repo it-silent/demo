@@ -6,7 +6,9 @@ import com.hy.demo.dal.dataobject.SttDO;
 import com.hy.demo.service.stt.SttService;
 import com.hy.demo.utils.WebUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -25,7 +27,7 @@ public class SttController extends BaseController {
     private SttService sttService;
 
     @GetMapping(path = "/list")
-    public CommonResult list() {
+    public CommonResult list() throws Exception {
         String cookieValue = null;
         if (ArrayUtils.isNotEmpty(request.getCookies())) {
             for (Cookie cookie : request.getCookies()) {
@@ -40,9 +42,26 @@ public class SttController extends BaseController {
         return CommonResult.success(sttService.findAll(), cookieValue);
     }
 
+    @GetMapping(path = "/info/{id}")
+    public CommonResult info(@PathVariable Long id) throws Exception {
+        return CommonResult.success(sttService.findById(id));
+    }
+
     @PostMapping(path = "/save")
-    public CommonResult save(@RequestBody SttDO sttDO) {
+    public CommonResult save(@RequestBody SttDO sttDO) throws Exception {
         sttService.create(sttDO.getCreator(), sttDO.getName(), sttDO.getLeaderId(), sttDO.getMasterId());
+        return CommonResult.success();
+    }
+
+    @PutMapping(path = "/update")
+    public CommonResult update(@RequestBody SttDO stt) throws Exception {
+        sttService.update(stt.getId(), stt.getName(), stt.getMasterId(), stt.getLeaderId());
+        return CommonResult.success();
+    }
+
+    @PutMapping(path = "/delete/{id}")
+    public CommonResult delete(@PathVariable Long id) throws Exception {
+        sttService.delete(id);
         return CommonResult.success();
     }
 }
