@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>main</title>
+    <script src="../static/js/jQuery-3.3.1-min.js"></script>
+</head>
+<style>
+    select {
+        width: 150px;
+    }
+</style>
+<body>
+    <div id="check">
+        <input type='checkbox' id='selectAll' /> 全选
+        <br>
+    </div>
+
+
+    <!--左右选择-->
+    <div id="select">
+    <select id="left">
+        <option id="left1">left1</option>
+        <option id="left2">left2</option>
+        <option id="left3">left3</option>
+        <option id="left4">left4</option>
+        <option id="left5">left5</option>
+        <option id="left6">left6</option>
+    </select>
+
+    <select id="right">
+        <option id="right1">right1</option>
+        <option id="right2">right2</option>
+        <option id="right3">right3</option>
+        <option id="right4">right4</option>
+        <option id="right5">right5</option>
+        <option id="right6">right6</option>
+    </select>
+    </div>
+</body>
+
+<script>
+    $(function () {
+        var checkbox = "";
+        for (var i = 0; i < 10; i++) {
+            checkbox += "<input name='chil' type=\"checkbox\" > checkbox "+ i + "<br>";
+        }
+        $("#check").append(checkbox);
+    });
+
+    $("#selectAll").click(function () {
+        $("#check input[name='chil']").prop("checked", this.checked)
+    });
+
+    $("#left option").click(function () {
+        $("#left option:selected").appendTo($("#right"));
+    });
+    $("right option").click(function () {
+        $("#right option:selected").appendTo($("#right"));
+    });
+
+    $("#left").children().forEach(function (index, item) {
+        if (item.selected()) {
+            item.appendTo($("right"))
+        }
+        // this.click(function () {
+        // })
+    })
+
+</script>
+</html>

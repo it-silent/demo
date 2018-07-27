@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajax</title>
+    <script src="../static/js/jQuery-3.3.1-min.js"></script>
+</head>
+<body>
+    <div>
+        <br>
+        <br>
+        <br>
+        <div align="center">
+            <button name="stt_list" style="width: 200px; height: 30px;">stt_list</button>
+        </div>
+        <br>
+        <table border="1px" align="center">
+            <thead>
+                <tr>
+                    <td>id</td>
+                    <td>gmtCreate</td>
+                    <td>gmtModified</td>
+                    <td>name</td>
+                    <td>type</td>
+                    <td>leaderId</td>
+                    <td>leaderNick</td>
+                    <td>masterId</td>
+                    <td>masterNick</td>
+                    <td>dingGroup</td>
+                    <td>createrId</td>
+                    <td>createrNick</td>
+                    <td>status</td>
+                </tr>
+            </thead>
+            <tbody id="stt_body">
+
+            </tbody>
+        </table>
+    </div>
+</body>
+
+<script>
+    $(function () {
+        $("button[name='stt_list']").click(function () {
+            $.ajax({
+                dataType: 'json',
+                method: 'GET',
+                url: '/stt/list'
+            }).done(function (data) {
+                var data = data.data;
+                var html = "";
+                // data.forEach(function (value, index) {
+                //     html += "<tr>\n" +
+                //         "                    <td>"+value.id+"</td>\n" +
+                //         "                    <td>"+value.gmtCreate+"</td>\n" +
+                //         "                    <td>"+value.gmtModified+"</td>\n" +
+                //         "                    <td>"+value.name+"</td>\n" +
+                //         "                    <td>"+value.type+"</td>\n" +
+                //         "                    <td>"+value.leaderId+"</td>\n" +
+                //         "                    <td>"+value.leaderNick+"</td>\n" +
+                //         "                    <td>"+value.masterId+"</td>\n" +
+                //         "                    <td>"+value.masterNick+"</td>\n" +
+                //         "                    <td>"+value.dingGroup+"</td>\n" +
+                //         "                    <td>"+value.createrId+"</td>\n" +
+                //         "                    <td>"+value.createrNick+"</td>\n" +
+                //         "                    <td>"+value.status+"</td>\n" +
+                //         "                </tr>";
+                // })
+
+                $(data).each(function (index, value) {
+                    html += "<tr>\n" +
+                        "                    <td>"+value.id+"</td>\n" +
+                        "                    <td>"+value.gmtCreate+"</td>\n" +
+                        "                    <td>"+value.gmtModified+"</td>\n" +
+                        "                    <td>"+value.name+"</td>\n" +
+                        "                    <td>"+value.type+"</td>\n" +
+                        "                    <td>"+value.leaderId+"</td>\n" +
+                        "                    <td>"+value.leaderNick+"</td>\n" +
+                        "                    <td>"+value.masterId+"</td>\n" +
+                        "                    <td>"+value.masterNick+"</td>\n" +
+                        "                    <td>"+value.dingGroup+"</td>\n" +
+                        "                    <td>"+value.createrId+"</td>\n" +
+                        "                    <td>"+value.createrNick+"</td>\n" +
+                        "                    <td>"+value.status+"</td>\n" +
+                        "                </tr>";
+                })
+                $("#stt_body").html(html);
+            })
+        });
+    })
+</script>
+</html>

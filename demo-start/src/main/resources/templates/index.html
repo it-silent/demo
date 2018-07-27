@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>html-index-test</title>
+    <script src="js/jQuery-3.3.1-min.js" type="text/javascript"></script>
+</head>
+
+<body>
+<div>
+    <h1>加大了家乐福地方了 </h1>
+    <table id="tab1" border="1px" align="center">
+        <thead>
+        <tr>
+            <td>username</td>
+            <td>email</td>
+            <td>mobile</td>
+        </tr>
+        </thead>
+        <tbody id="tbody">
+        </tbody>
+    </table>
+</div>
+<div>
+    username: <input type="text" id="username"/>
+    <br>
+    password: <input type="password" id="password"/>
+    <br>
+    <button id="submitBt">提交</button>
+</div>
+
+</body>
+<script type="text/javascript">
+    // $(document).ready(function () {
+    //     alert("ready!")
+    // });
+
+    var trtd = "<tr>\n" +
+        "                <td>silent</td>\n" +
+        "                <td>yhy0417</td>\n" +
+        "                <td>000347</td>\n" +
+        "       </tr>";
+    var $body = $("#tab1 tbody");
+    for (var i = 0; i < 10; i++) {
+        $body.append(trtd);
+    }
+
+    $("tr:even").css("background-color", "red");
+    $("tr:odd").css("background-color", "yellow");
+
+    $("#submitBt").click(function () {
+        alert($("#username").val() + "\r\n" + $("#password").val());
+    });
+</script>
+</html>

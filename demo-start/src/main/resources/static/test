@@ -1,0 +1,2816 @@
+create table biz_answer_sheet
+(
+	id int auto_increment
+		primary key,
+	questionnaire_id int not null comment '问卷ID',
+	business_id int null comment '问卷归属业务',
+	business_type int default '1' not null comment '问卷归属业务类型：1 => 网站自查',
+	answered_by int not null comment '答卷人',
+	created_by int not null comment '实际答卷人',
+	created_at datetime not null comment '答卷时间'
+)
+comment '答卷' charset=utf8
+;
+
+create table biz_answered_item
+(
+	id int auto_increment
+		primary key,
+	sheet_id int not null comment '答卷ID',
+	question_item_id int not null comment '问题ID',
+	question_option_id int not null comment '问题选项ID',
+	question_option_value text null comment '问题选项值'
+)
+comment '答卷::回答的选项' charset=utf8
+;
+
+create table biz_bill
+(
+	bill_id int auto_increment
+		primary key,
+	bill_djhm varchar(60) null comment '单据号码',
+	bill_type int not null comment '1、预警单            
+2、处置单',
+	tl_id int null comment '条例id',
+	cf_id int null comment '处罚id',
+	bill_rectify_date datetime null comment '整改日期',
+	total_count int null,
+	finish_count int null,
+	bill_finish_date datetime null comment '完成时间',
+	bill_isdel int not null comment '是否删除',
+	bill_create_date datetime not null comment '创建时间',
+	bill_update_date datetime null comment '修改时间',
+	bill_create_user int not null comment '创建用户',
+	bill_update_user int null comment '修改用户',
+	website_id int null,
+	bill_finish_status int default '1' null comment '0已过期,1未处理,2已处理',
+	bill_status int null comment ' 
+0、待审批
+1、通过
+2、驳回       
+',
+	bill_create_tbdw varchar(255) null comment '通报单位',
+	constraint bill_djhm
+		unique (bill_djhm)
+)
+comment '单据表' charset=utf8
+;
+
+create table biz_bill_detail
+(
+	id int auto_increment
+		primary key,
+	bill_id int not null comment '单据id',
+	type int null comment ' 
+1、漏洞            
+2、可用性            
+3、暗链
+4、dns劫持
+5、篡改
+6、木马   
+',
+	bus_id int not null comment '事件id'
+)
+comment '单据明细表' charset=utf8
+;
+
+create table biz_bill_verify
+(
+	id int auto_increment
+		primary key,
+	bill_id int null comment ' 
+单据id        
+',
+	shrid int not null comment '审核人id',
+	shsj datetime null comment '审核时间',
+	shjg int null comment ' 
+0、未审批            
+1、审批通过            
+2、审批未通过           
+',
+	sbyy varchar(1000) null
+)
+comment '单据审批表' charset=utf8
+;
+
+create table biz_dnshijack_executor
+(
+	id int auto_increment
+		primary key,
+	user_id int not null comment '执行人id',
+	dns_id int not null comment '劫持id'
+)
+comment '劫持执行表' charset=utf8
+;
+
+create table biz_dnshijack_step
+(
+	id int auto_increment
+		primary key,
+	dns_id int not null comment '劫持id',
+	pxh int not null comment '排序号',
+	clfs int not null comment '1、开始处理      （处理中）                
+2、处理完毕      （待复核）                 
+3、复核存在      （待处理）                 
+4、复核不存在  （已修复）                      
+5、发送预警单                        
+6、查看预警单                        
+7、发送处置单                        
+8、查看处理单               
+',
+	clrid int not null comment '处理人id',
+	clsj datetime not null comment '处理时间',
+	cljg varchar(300) not null comment '处理结果',
+	isdel int not null comment '是否删除',
+	create_date datetime not null comment '创建时间',
+	update_date datetime null comment '修改时间',
+	create_user int not null comment '创建用户',
+	update_user int null comment '修改用户',
+	resolvement varchar(1000) null
+)
+comment '劫持处置表' charset=utf8
+;
+
+create table biz_hiddenlink_executor
+(
+	id int auto_increment
+		primary key,
+	user_id int not null comment '执行人id',
+	hid_id int not null comment '漏洞id'
+)
+comment '暗链执行表' charset=utf8
+;
+
+create table biz_hiddenlink_step
+(
+	id int auto_increment
+		primary key,
+	hid_id int not null comment '漏洞id',
+	pxh int not null comment '排序号',
+	clfs int not null comment '1、开始处理      （处理中）                
+2、处理完毕      （待复核）                 
+3、复核存在      （待处理）                 
+4、复核不存在  （已修复）                      
+5、发送预警单                        
+6、查看预警单                        
+7、发送处置单                        
+8、查看处理单               
+',
+	clrid int not null comment '处理人id',
+	clsj datetime not null comment '处理时间',
+	cljg varchar(300) not null comment '处理结果',
+	isdel int not null comment '是否删除',
+	create_date datetime not null comment '创建时间',
+	update_date datetime null comment '修改时间',
+	create_user int not null comment '创建用户',
+	update_user int null comment '修改用户',
+	resolvement varchar(1000) null
+)
+comment '暗链处置表' charset=utf8
+;
+
+create table biz_indus_ctl_ware
+(
+	id int auto_increment
+		primary key,
+	owner_id int not null comment '所属业主单位',
+	ouname varchar(128) null comment '单位名称,将在未来版本中移除',
+	name varchar(128) not null comment '工控系统名称',
+	name_pinyin varchar(256) null comment '工控系统名称的拼音',
+	operating_system varchar(255) null comment '操作系统',
+	firewall varchar(255) null comment '防火墙',
+	anti_vul_soft varchar(255) null comment '杀毒软件',
+	router varchar(255) null comment '路由器',
+	area_id int null,
+	industry_id int null,
+	classified bit default b'0' null comment '是否定级',
+	classified_number varchar(64) null comment '等保备案号',
+	classified_level varchar(32) null comment '系统保护级别',
+	certificated bit default b'0' null comment '是否测评',
+	certificated_by varchar(64) null comment '测评公司',
+	certificated_at datetime null comment '测评时间',
+	network_scope varchar(24) null comment '网域：内网|外网',
+	ip varchar(29) null comment 'IP地址',
+	hosted_in varchar(12) null comment '服务器位置：市内|省内|省外',
+	is_oncloud int null comment '是否加入电子政务云 1是 0不是',
+	submitted_by int null comment '上报人ID',
+	submitted_at datetime null comment '上报时间',
+	created_by int not null comment '创建人',
+	created_at datetime not null comment '创建时间',
+	error_params text null comment '错误的字段',
+	reject_reason varchar(1000) null comment '驳回原因',
+	approve_status varchar(255) null comment '审批阶段，edit编辑，industry-approve行业主管待审批，industry-accept行业主管通过，industry-reject行业主管驳回，police-approve网警待审批，police-accept网警通过，police-reject网警驳回',
+	current_point varchar(255) null comment '当前节点，industry行业主管，police网警',
+	risk_assessment_file varchar(255) null comment '风险评估报告书',
+	is_open int null comment '是否开启 1是 0否',
+	open_date datetime null comment '开启时间',
+	close_date datetime null comment '关闭时间',
+	system_usage varchar(255) null comment '系统用途 平台云，大数据，视频监控，移动互联，邮件服务，IDC，CDN，DNS，逗号隔开',
+	system_usage_other varchar(255) null comment '系统用途 其他',
+	operator_name varchar(255) null comment '责任单位::名称',
+	operator_officer_name varchar(255) null comment '责任单位::负责人::姓名',
+	operator_officer_title varchar(255) null comment '责任单位::负责人::职务',
+	operator_officer_phone varchar(255) null comment '责任单位::负责人::联系电话',
+	is_key_system int null comment '是否是关键信息基础设施 0:不是，1:是',
+	system_code varchar(255) null comment '系统编号',
+	secmanager_officer_name varchar(255) null comment '网站安全::管理人员::姓名',
+	secmanager_officer_title varchar(255) null comment '网站安全::管理人员::职位',
+	secmanager_officer_phone varchar(255) null comment '网站安全::管理人员::联系电话',
+	deleted_date datetime null comment '删除时间',
+	deleted_reason text null comment '删除原因',
+	is_deleted int null comment '是否删除'
+)
+comment '等级保护::工控系统' charset=utf8
+;
+
+create table biz_indus_ctl_ware_dirty
+(
+	id int auto_increment
+		primary key,
+	anti_vul_soft varchar(255) null comment '杀毒软件',
+	approve_status varchar(255) null comment '审批状态',
+	area_id int null comment '区域id',
+	certificated bit default b'0' null comment '是否定级',
+	certificated_at datetime null comment '测评时间',
+	certificated_by varchar(64) null comment '测评公司',
+	classified bit default b'0' null comment '是否定级',
+	classified_level varchar(32) null comment '系统保护级别',
+	classified_number varchar(64) null comment '等保备案号',
+	close_date datetime null comment '关闭时间',
+	created_at datetime null comment '创建时间',
+	created_by int null comment '创建者id',
+	current_point varchar(255) null comment '当前节点',
+	error_params text null comment '错误字段',
+	firewall varchar(255) null comment '防火墙',
+	hosted_in varchar(12) null comment '服务器位置',
+	industry_id int null comment '行业id',
+	ip varchar(29) null comment 'ip',
+	is_key_system int null comment '是否是关键信息基础设施',
+	is_oncloud int null comment '是否加入电子政务云',
+	is_open int null comment '是否开启',
+	name varchar(128) null comment '工控系统名称',
+	network_scope varchar(24) null comment '网域',
+	open_date datetime null comment '开启时间',
+	operating_system varchar(255) null comment '操作系统',
+	operator_name varchar(255) null comment '责任单位名称',
+	operator_officer_name varchar(255) null comment '责任单位负责人名称',
+	operator_officer_phone varchar(255) null comment '责任单位负责人电话',
+	operator_officer_title varchar(255) null comment '责任单位负责人职务',
+	ouname varchar(128) null comment '单位名称',
+	owner_id int null comment '业主单位id',
+	reject_reason text null comment '拒绝原因',
+	risk_assessment_file varchar(255) null comment '风险评估报告书',
+	router varchar(255) null comment '路由器',
+	secmanager_officer_name varchar(255) null comment '网站安全管理人名称',
+	secmanager_officer_phone varchar(255) null comment '网站安全管理人电话',
+	secmanager_officer_title varchar(255) null comment '网站安全管理人职务',
+	submitted_at datetime null comment '提交时间',
+	submitted_by int null comment '提交人id',
+	system_code varchar(255) null comment '系统编码',
+	system_usage varchar(255) null comment '系统用途',
+	system_usage_other varchar(255) null comment '系统用途其他'
+)
+;
+
+create table biz_indus_ctl_ware_isopen_detail
+(
+	id int auto_increment
+		primary key,
+	it_ware_id int null comment '工控系统id',
+	create_user_id int null comment '创建人id',
+	created_date datetime null comment '创建时间',
+	is_open int null comment '是否开启 1是 0否'
+)
+comment '网站启停操作记录' charset=utf8
+;
+
+create table biz_indus_ctl_ware_operation
+(
+	id int auto_increment
+		primary key,
+	edit_additional varchar(255) null comment '额外信息',
+	indusctlware_id int null comment '工控系统id',
+	operated_at datetime null comment '操作时间',
+	operated_by int null comment '操作人id',
+	operated_type varchar(255) null comment '操作类型'
+)
+;
+
+create table biz_industry_unit
+(
+	id int auto_increment
+		primary key,
+	name varchar(128) not null comment '行业主管单位名称',
+	name_pinyin varchar(256) null comment '行业主管单位名称的拼音',
+	address varchar(256) null comment '单位地址',
+	registry_code varchar(255) null comment '备案编号',
+	industry_id int null comment '行业id 所属行业',
+	area_id int null comment '区域id 所属公安机关',
+	leader_name varchar(64) null comment '分管领导',
+	leader_title varchar(64) null comment '职称/职务（头衔）',
+	officer_deptname varchar(255) null comment '网络安全责任部门',
+	officer_name varchar(64) null comment '负责人:姓名',
+	officer_title varchar(64) null comment '负责人:职衔',
+	officer_telephone varchar(64) null comment '负责人:座机号',
+	officer_mobile varchar(20) null comment '负责人:手机号',
+	contact_name varchar(64) null comment '联系人:姓名',
+	contact_title varchar(64) null comment '联系人:职衔',
+	contact_telephone varchar(32) null comment '联系人:座机号',
+	contact_mobile varchar(20) null comment '联系人:手机号',
+	created_by int null comment '创建人ID（业主单位用户）',
+	created_at datetime null comment '创建日期',
+	error_params text null comment '错误的字段，逗号隔开',
+	reject_reason varchar(1000) null comment '驳回原因',
+	approve_status varchar(255) null comment '审批阶段，edit编辑，police-approve网警待审批，police-accept网警通过，police-reject网警驳回',
+	industry_user_id int null comment '行业主管id 是哪个行业主管的基本信息',
+	submitted_by int null comment '上报人ID',
+	submitted_at datetime null comment '上报时间',
+	constraint uk_name
+		unique (name)
+)
+comment '行业主管单位 基本信息' charset=utf8
+;
+
+create table biz_industry_unit_operation
+(
+	id int auto_increment
+		primary key,
+	edit_additional text null comment '编辑字段',
+	industry_id int null comment '行业主管id',
+	operated_at datetime null comment '操作时间',
+	operated_by int null comment '操作人id',
+	operated_type varchar(255) null comment '操作类型'
+)
+;
+
+create table biz_ips
+(
+	id int auto_increment
+		primary key,
+	website_id int null comment '网站id',
+	website_name varchar(200) null comment '网站名称',
+	website_url varchar(100) null comment '网站域名',
+	target_ip varchar(100) null comment '被攻击的服务器',
+	step varchar(100) null comment '入侵阶段',
+	type varchar(100) null comment '入侵类型',
+	result varchar(100) null comment '入侵结果',
+	source_ip varchar(100) null comment '攻击源ip',
+	src_ip_area varchar(100) null comment '入侵源属地',
+	happened_time datetime null comment '最近入侵时间',
+	danger_level varchar(100) null comment '严重等级',
+	action varchar(100) null comment '防御动作',
+	description varchar(1000) null comment '事件描述',
+	url varchar(1000) null comment '入侵目录url',
+	harm_detail varchar(300) null comment '危害说明',
+	target_group varchar(100) null comment '业务组'
+)
+comment '入侵防御表' charset=utf8
+;
+
+create table biz_it_ware
+(
+	id int auto_increment
+		primary key,
+	owner_id int not null comment '所属业主单位',
+	ouname varchar(128) null comment '单位名称,将在未来版本中移除',
+	name varchar(128) not null comment '信息系统名称',
+	name_pinyin varchar(256) null comment '信息系统名称的拼音',
+	operating_system varchar(255) null comment '操作系统',
+	firewall varchar(255) null comment '防火墙',
+	anti_vul_soft varchar(255) null comment '杀毒软件',
+	router varchar(255) null comment '路由器',
+	area_id int null,
+	industry_id int null,
+	classified bit default b'0' null comment '是否定级',
+	classified_number varchar(64) null comment '等保备案号',
+	classified_level varchar(32) null comment '系统保护级别',
+	certificated bit default b'0' null comment '是否测评',
+	certificated_by varchar(64) null comment '测评公司',
+	certificated_at datetime null comment '测评时间',
+	network_scope varchar(24) null comment '网域：内网|外网',
+	ip varchar(29) null comment 'IP地址',
+	hosted_in varchar(12) null comment '服务器位置：市内|省内|省外',
+	is_oncloud int null comment '是否加入电子政务云 1是 0不是',
+	submitted_by int null comment '上报人ID',
+	submitted_at datetime null comment '上报时间',
+	created_by int not null comment '创建人',
+	created_at datetime not null comment '创建时间',
+	error_params text null comment '错误的字段',
+	reject_reason varchar(1000) null comment '驳回原因',
+	approve_status varchar(255) null comment '审批阶段，edit编辑，industry-approve行业主管待审批，industry-accept行业主管通过，industry-reject行业主管驳回，police-approve网警待审批，police-accept网警通过，police-reject网警驳回',
+	current_point varchar(255) null comment '当前节点，industry行业主管，police网警',
+	risk_assessment_file varchar(255) null comment '风险评估报告书',
+	is_open int null comment '是否开启 1是 0否',
+	open_date datetime null comment '开启时间',
+	close_date datetime null comment '关闭时间',
+	system_usage varchar(255) null comment '系统用途 平台云，大数据，视频监控，移动互联，邮件服务，IDC，CDN，DNS，逗号隔开',
+	system_usage_other varchar(255) null comment '系统用途 其他',
+	operator_name varchar(255) null comment '责任单位::名称',
+	operator_officer_name varchar(255) null comment '责任单位::负责人::姓名',
+	operator_officer_title varchar(255) null comment '责任单位::负责人::职务',
+	operator_officer_phone varchar(255) null comment '责任单位::负责人::联系电话',
+	is_key_system int null comment '是否是关键信息基础设施 0:不是，1:是',
+	system_code varchar(255) null comment '系统编号',
+	secmanager_officer_name varchar(255) null comment '网站安全::管理人员::姓名',
+	secmanager_officer_title varchar(255) null comment '网站安全::管理人员::职位',
+	secmanager_officer_phone varchar(255) null comment '网站安全::管理人员::联系电话',
+	deleted_date datetime null comment '删除时间',
+	deleted_reason text null comment '删除原因',
+	industr_id int null comment '区域id',
+	is_deleted int null comment '是否已删除'
+)
+comment '等级保护::信息系统' charset=utf8
+;
+
+create table biz_it_ware_dirty
+(
+	id int auto_increment
+		primary key,
+	anti_vul_soft varchar(255) null comment '杀毒软件',
+	approve_status varchar(255) null comment '审核状态',
+	area_id int null comment '区域id',
+	certificated bit default b'0' null comment '是否测评',
+	certificated_at datetime null comment '测评时间',
+	certificated_by varchar(255) null comment '测评公司',
+	classified bit default b'0' null comment '是否定级',
+	classified_level varchar(32) null comment '等保等级',
+	classified_number varchar(64) null comment '等保备案号',
+	close_date datetime null comment '关闭时间',
+	created_at datetime null comment '创建时间',
+	created_by int null comment '创建人id',
+	current_point varchar(255) null comment '当前节点',
+	error_params text null comment '错误字段',
+	firewall varchar(255) null comment '防火墙',
+	hosted_in varchar(12) null comment '服务器位置',
+	industry_id int null comment '区域id',
+	ip varchar(29) null comment 'ip',
+	is_key_system int null comment '是否是关键信息基础设施',
+	is_oncloud int null comment '是否加入电子政务云',
+	is_open int null comment '开启状态',
+	name varchar(128) null comment '信息系统名称',
+	network_scope varchar(24) null comment '网域',
+	open_date datetime null comment '开启时间',
+	operating_system varchar(255) null comment '操作系统',
+	operator_name varchar(255) null comment '责任单位名称',
+	operator_officer_name varchar(255) null comment '责任单位负责人名称',
+	operator_officer_phone varchar(255) null comment '责任单位负责人电话',
+	operator_officer_title varchar(255) null comment '责任单位负责人职务',
+	ouname varchar(128) null comment '单位名称',
+	owner_id int null comment '单位id',
+	reject_reason text null comment '拒绝原因',
+	risk_assessment_file varchar(255) null comment '风险评估报告书',
+	router varchar(255) null comment '路由器',
+	secmanager_officer_name varchar(255) null comment '网站安全负责人名称',
+	secmanager_officer_phone varchar(255) null comment '网站安全负责人电话',
+	secmanager_officer_title varchar(255) null comment '网站安全负责人职务',
+	submitted_at datetime null comment '提交时间',
+	submitted_by int null comment '提交人',
+	system_code varchar(255) null comment '系统编码',
+	system_usage varchar(255) null comment '系统用途',
+	system_usage_other varchar(255) null comment '系统用途其他'
+)
+;
+
+create table biz_it_ware_isopen_detail
+(
+	id int auto_increment
+		primary key,
+	it_ware_id int null comment '信息系统id',
+	create_user_id int null comment '创建人id',
+	created_date datetime null comment '创建时间',
+	is_open int null comment '是否开启 1是 0否'
+)
+comment '网站启停操作记录' charset=utf8
+;
+
+create table biz_it_ware_operation
+(
+	id int auto_increment
+		primary key,
+	edit_additional text null comment '编辑的字段',
+	itware_id int null comment '信息系统id',
+	operated_at datetime null comment '操作时间',
+	operated_by int null comment '操作人id',
+	operated_type varchar(255) null comment '操作类型'
+)
+;
+
+create table biz_key_it_ware
+(
+	id int auto_increment comment '表id'
+		primary key,
+	owner_id int not null comment '所属业主单位',
+	ouname varchar(128) null comment '单位名称,将在未来版本中移除',
+	name varchar(128) not null comment '关键信息基础设施名称',
+	contact_name varchar(255) null comment '联系人',
+	contact_tel varchar(255) null comment '联系人固定电话',
+	contact_mobile varchar(255) null comment '联系人手机',
+	area_id int null comment '地区id，所属公安局',
+	industry_id int null comment '行业id，所属行业主管',
+	classified bit default b'0' null comment '是否定级',
+	classified_number varchar(64) null comment '等保备案号',
+	classified_level varchar(32) null comment '系统保护级别',
+	certificated bit default b'0' null comment '是否测评',
+	certificated_by varchar(64) null comment '测评公司',
+	certificated_at datetime null comment '测评时间',
+	serve_scope varchar(255) null comment '服务范围',
+	serve_target varchar(255) null comment '服务对象',
+	on_internet int null comment '是否连接互联网 1是 0不是',
+	domain_name varchar(255) null comment '域名',
+	dns_name varchar(255) null comment '域名注册服务机构::名称',
+	dns_contact varchar(255) null comment '域名注册服务机构::联系方式',
+	dns_record_ns varchar(255) null comment '.cn域名的NS记录',
+	dns_record_a varchar(255) null comment '.cn域名的A记录',
+	ip_range varchar(255) null comment '主站IP地址范围',
+	protocol varchar(255) null comment '主要协议',
+	port varchar(255) null comment '主要端口',
+	operating_system varchar(255) null comment '操作系统版本',
+	isp_name varchar(255) null comment '接入运营商::名称',
+	isp_contact varchar(255) null comment '接入运营商::联系方式',
+	isp_address varchar(255) null comment '物理接入位置',
+	isp_bandwidth varchar(255) null comment '接入带宽',
+	cdn_ip_range varchar(255) null comment 'CDN IP地址范围',
+	cdn_name varchar(255) null comment 'CDN 服务提供商',
+	cdn_contact_name varchar(255) null comment 'CDN 联系人姓名',
+	cdn_contact_mobile varchar(255) null comment 'CDN 联系人手机号',
+	submitted_by int null comment '上报人ID',
+	submitted_at datetime null comment '上报时间',
+	created_by int not null comment '创建人',
+	created_at datetime not null comment '创建时间',
+	error_params text null comment '错误的字段',
+	reject_reason varchar(1000) null comment '驳回原因',
+	approve_status varchar(255) null comment '审批阶段，edit编辑，industry-approve行业主管待审批，industry-accept行业主管通过，industry-reject行业主管驳回，police-approve网警待审批，police-accept网警通过，police-reject网警驳回',
+	current_point varchar(255) null comment '当前节点，industry行业主管，police网警',
+	is_open int null comment '是否开启 1是 0否',
+	open_date datetime null comment '开启时间',
+	close_date datetime null comment '关闭时间',
+	target_id int null comment '关联ip 对应biz_sp_website,biz_it_ware,biz_indus_ctl_ware中的id',
+	target_type varchar(20) null comment '关联类型 web:网站，indus:工控系统，itware:信息系统',
+	system_code varchar(255) null comment '系统编号',
+	deleted_date datetime null comment '删除时间',
+	deleted_reason text null comment '删除原因',
+	is_deleted int null comment '是否删除'
+)
+comment '等级保护::关键信息系统' charset=utf8
+;
+
+create table biz_key_it_ware_isopen_detail
+(
+	id int auto_increment
+		primary key,
+	key_it_ware_id int null comment '关键信息系统id',
+	create_user_id int null comment '创建人id',
+	created_date datetime null comment '创建时间',
+	is_open int null comment '是否开启 1是 0否'
+)
+comment '网站启停操作记录' charset=utf8
+;
+
+create table biz_meeting
+(
+	id int auto_increment comment '表id'
+		primary key,
+	title varchar(255) null comment '标题',
+	type varchar(255) null comment '类型 notice：通知，meeting：会议',
+	content text null comment '内容',
+	attachment varchar(255) null comment '附件文件名',
+	publish_date datetime null comment '发布时间',
+	publish_userid int null comment '发布人id',
+	deleted int null comment '是否删除 1是 0不是',
+	meeting_date datetime null comment '会议时间',
+	meeting_place varchar(255) null comment '会议地点',
+	creator_type varchar(255) null comment '创建人类型，city：市级，county：区级',
+	need_attr int null comment '是否需要业主上传附件，1：是，0：否'
+)
+comment '通知通告 会议表'
+;
+
+create table biz_meeting_fb
+(
+	id int auto_increment comment '表id'
+		primary key,
+	meeting_id int null comment '通知通告id',
+	owner_id int null comment '单位id',
+	feedback_status varchar(255) null comment '反馈状态 create：未反馈 proceed：已反馈',
+	feedback_date datetime null comment '反馈时间',
+	feedback_userid int null comment '反馈的账号id',
+	target_type varchar(255) null comment '接收对象的类型，police：区网警，owner：业主，industry：行业',
+	police_id int null comment '区网警id，就是区域的deptid',
+	industry_accountid int null comment '行业主管 账号id',
+	attachment varchar(50) null comment '业主附件名称',
+	receive_date datetime null comment '签收时间',
+	receive_status varchar(20) null comment '签收状态 received：已签收，unreceived：未签收',
+	rejected_reason text null comment '拒绝原因',
+	feedback_result varchar(20) null comment '反馈结果 agreed：已接受，rejected：已拒绝'
+)
+comment '通知通告 业主反馈表'
+;
+
+create table biz_meeting_fb_contact
+(
+	id int auto_increment comment '表id'
+		primary key,
+	meeting_id int null comment '通知通告id',
+	owner_id int null comment '单位id',
+	actor_name varchar(255) null comment '参与者 姓名',
+	actor_title varchar(255) null comment '参与者 职务',
+	actor_phone varchar(255) null comment '参与者 电话',
+	target_type varchar(255) null comment '接收对象的类型，police：区网警，owner：业主，industry：行业',
+	police_id int null comment '区网警id，就是区域的deptid',
+	industry_accountid int null comment '行业主管 账号id'
+)
+comment '通知通告 联系人'
+;
+
+create table biz_meeting_industry_area
+(
+	id int auto_increment comment '表id'
+		primary key,
+	meeting_id int null comment '会议id',
+	type varchar(255) null comment '关联类型 行业：industry 区域：area',
+	target_id int null comment '行业或者区域的id'
+)
+comment '通知通告 行业区域关联'
+;
+
+create table biz_message
+(
+	msg_id int auto_increment
+		primary key,
+	msg_content mediumtext not null comment '消息内容',
+	msg_type int not null comment '消息类型',
+	bus_id int not null comment '业务id',
+	msg_read int not null comment '是否已读',
+	msg_isdel int not null comment '是否删除',
+	msg_create_user int not null comment '发送者',
+	msg_create_date datetime not null comment '发送时间',
+	msg_receive_user int not null comment '接收者',
+	msg_is_outdated varchar(255) null comment '是否已失效 y是 n不是'
+)
+comment '消息表' charset=utf8
+;
+
+create table biz_organization_unit
+(
+	id int auto_increment
+		primary key,
+	owner_id int not null comment '业主单位ID',
+	name varchar(128) not null comment '单位名称',
+	name_pinyin varchar(256) null comment '单位名称的拼音',
+	type int null comment '单位类型：事业单位、党政机关、国有企业、社会团体。 [引用字典项ID: class_code=ou-type]',
+	address varchar(256) null comment '单位地址',
+	industry_id int null comment '行业id 所属行业',
+	area_id int null comment '区域id 所属公安机关',
+	supervisor_name varchar(128) null comment '主管单位',
+	is_supervisor bit default b'0' null comment '是否主管部门',
+	leader_name varchar(64) null comment '分管领导',
+	leader_title varchar(64) null comment '职称/职务（头衔）',
+	officer_name varchar(64) null comment '负责人:姓名',
+	officer_title varchar(64) null comment '负责人:职衔',
+	officer_telephone varchar(64) null comment '负责人:座机号',
+	officer_mobile varchar(20) null comment '负责人:手机号',
+	contact_name varchar(64) null comment '联系人:姓名',
+	contact_title varchar(64) null comment '联系人:职衔',
+	contact_telephone varchar(32) null comment '联系人:座机号',
+	contact_mobile varchar(20) null comment '联系人:手机号',
+	created_by int null comment '创建人ID（业主单位用户）',
+	created_at datetime null comment '创建日期',
+	error_params text null comment '错误的字段，逗号隔开',
+	reject_reason varchar(1000) null comment '驳回原因',
+	approve_status varchar(255) null comment '审批阶段，edit编辑，industry-approve行业主管待审批，industry-accept行业主管通过，industry-reject行业主管驳回，police-approve网警待审批，police-accept网警通过，police-reject网警驳回',
+	current_point varchar(255) null comment '当前节点，industry行业主管，police网警',
+	has_website int null,
+	has_system int null,
+	has_key_info int null,
+	is_signed int null,
+	submitted_by int null comment '上报人ID',
+	submitted_at datetime null comment '上报时间',
+	export_ip varchar(255) null comment '出口ip',
+	ip_supplier varchar(255) null comment 'ip运营商',
+	constraint uk_name
+		unique (name)
+)
+comment '组织机构（单位基本信息）' charset=utf8
+;
+
+create table biz_organization_unit_history
+(
+	id int not null
+		primary key,
+	owner_id int not null comment '业主单位ID',
+	name varchar(128) not null comment '单位名称',
+	name_pinyin varchar(256) null comment '单位名称的拼音',
+	type int not null comment '单位类型：事业单位、党政机关、国有企业、社会团体。 [引用字典项ID: class_code=ou-type]',
+	address varchar(256) not null comment '单位地址',
+	industry_id int not null comment '行业。 [引用字典项ID: class_code=ou-industry]',
+	supervisor_name varchar(128) not null comment '主管单位',
+	is_supervisor bit default b'0' not null comment '是否主管部门',
+	leader_name varchar(64) not null comment '分管领导',
+	leader_title varchar(64) not null comment '职称/职务（头衔）',
+	officer_name varchar(64) not null comment '负责人:姓名',
+	officer_title varchar(64) not null comment '负责人:职衔',
+	officer_telephone varchar(64) not null comment '负责人:座机号',
+	officer_mobile varchar(20) not null comment '负责人:手机号',
+	contact_name varchar(64) not null comment '联系人:姓名',
+	contact_title varchar(64) not null comment '联系人:职衔',
+	contact_telephone varchar(32) not null comment '联系人:座机号',
+	contact_mobile varchar(20) not null comment '联系人:手机号',
+	created_by int not null comment '创建人ID（业主单位用户）',
+	created_at datetime not null comment '创建日期'
+)
+comment '组织机构（单位基本信息）历史记录' charset=utf8
+;
+
+create table biz_organization_unit_operation
+(
+	id int auto_increment
+		primary key,
+	edit_additional text null comment '额外信息',
+	operated_at datetime null comment '操作时间',
+	operated_by int null comment '操作人id',
+	operated_type varchar(255) null comment '操作类型',
+	unit_id int null comment 'id'
+)
+;
+
+create table biz_question_group
+(
+	id int auto_increment
+		primary key,
+	questionnaire_id int not null comment '问卷ID',
+	name varchar(128) null comment '组名称',
+	sort_score int default '0' null comment '排序权重',
+	created_by int null comment '创建人',
+	created_at datetime null comment '创建时间'
+)
+comment '问卷::问题组' charset=utf8
+;
+
+create table biz_question_item
+(
+	id int auto_increment
+		primary key,
+	group_id int not null comment '问题组ID',
+	content text null comment '问题内容',
+	allow_multiple bit default b'0' not null comment '是否允许多选',
+	sort_score int default '0' null comment '排序权重',
+	created_by int null comment '创建人',
+	created_at datetime null comment '创建时间'
+)
+comment '问卷::问题' charset=utf8
+;
+
+create table biz_question_option
+(
+	id int auto_increment
+		primary key,
+	item_id int not null comment '问题组ID',
+	label varchar(128) null comment '选项标签',
+	type int not null comment '选项类型： 0 => 选择选项, 1 => 填写选项',
+	value text null comment '选项值： type==1时，此处为用户的默认填写内容',
+	sort_score int default '0' null comment '排序权重',
+	created_by int null comment '创建人',
+	created_at datetime null comment '创建时间'
+)
+comment '问卷::问题选项' charset=utf8
+;
+
+create table biz_questionnaire
+(
+	id int auto_increment
+		primary key,
+	title varchar(128) null,
+	description text null,
+	created_by int null,
+	created_at datetime null
+)
+comment '问卷' charset=utf8
+;
+
+create table biz_secquestion_template
+(
+	id int auto_increment comment '模板id'
+		primary key,
+	title varchar(255) null comment '标题',
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '编辑时间',
+	fullData mediumtext null comment '完整的json数据',
+	type varchar(255) null comment '类型 normal：正常数据，shadow：发出去的问卷数据',
+	subTitle text null comment '副标题',
+	lastPublishDate datetime null comment '上一次发送时间'
+)
+comment '安全自查-模板' charset=utf8
+;
+
+create table biz_secquestion_topic
+(
+	id int auto_increment comment '主题id'
+		primary key,
+	templateId int null comment '模板id',
+	title varchar(255) null comment '标题',
+	publishDate datetime null comment '发布时间',
+	publishUserId int null comment '发布人id',
+	ownerIds text null comment '业主id列表 逗号隔开多个',
+	industryIds text null comment '行业主管id列表 逗号隔开多个',
+	targetCount int(255) null comment '单位数量',
+	finishCount int(255) null comment '回收单位数'
+)
+comment '安全自查主题' charset=utf8
+;
+
+create table biz_secquestion_topic_answer
+(
+	id int auto_increment comment '反馈id'
+		primary key,
+	topicId int null comment '主题id',
+	templateId int null comment '模板id',
+	ownerId int null comment '业主id',
+	industryId int null comment '行业主管id',
+	feedbackStatus varchar(255) null comment '反馈状态 create：新建未反馈，saved：保存未提交，proceed：已反馈',
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '编辑时间',
+	feedbackDate datetime null comment '反馈时间',
+	feedbackTimelast bigint null comment '反馈用时 毫秒差值',
+	answerFullData text null comment '反馈的完整数据 反馈的时候装配这个数据 作为原始数据',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间'
+)
+comment '主题 单个反馈数据' charset=utf8
+;
+
+create table biz_secquestion_topic_stat
+(
+	id int auto_increment comment '表id'
+		primary key,
+	topicId int null comment '主题id',
+	targetCountTotal int null comment '发送对象总数',
+	finishCountTotal int null comment '回收对象总数',
+	finishTimeLastTotal bigint null comment '回收总时间 毫秒值',
+	answerStat text null comment '答案的统计 json 格式',
+	constraint topicId
+		unique (topicId) comment '唯一'
+)
+comment '安全自查 主题统计' charset=utf8
+;
+
+create table biz_self_check_notice
+(
+	id int auto_increment
+		primary key,
+	sender_id int not null comment '创建者/发布者，即网警ID',
+	receiver_id int null comment '接收者，即业主单位ID',
+	sent_at datetime null comment '发布时间'
+)
+charset=utf8
+;
+
+create table biz_self_check_notice_history
+(
+	id int not null
+		primary key,
+	sender_id int not null comment '创建者/发布者，即网警ID',
+	receiver_id int null comment '接收者，即业主单位ID',
+	sent_at datetime null comment '发布时间'
+)
+charset=utf8
+;
+
+create table biz_sp_website
+(
+	id int auto_increment comment '表id'
+		primary key,
+	owner_id int not null comment '所属业主单位',
+	ouname varchar(128) null comment '单位名称,将在未来版本中移除',
+	name varchar(128) not null comment '网站名称',
+	domain_name varchar(255) null comment '域名',
+	ip varchar(255) null comment 'ip',
+	web_status varchar(255) null comment '网站状态 good正常 error异常',
+	area_id int null comment '地区id，所属公安局',
+	industry_id int null comment '行业id，所属行业主管',
+	address varchar(255) null comment '网站所在地',
+	operator_name varchar(255) null comment '责任单位::名称',
+	operator_officer_name varchar(255) null comment '责任单位::负责人::姓名',
+	operator_officer_title varchar(255) null comment '责任单位::负责人::职务',
+	operator_officer_phone varchar(255) null comment '责任单位::负责人::联系电话',
+	secmanager_officer_name varchar(255) null comment '网站安全::管理人员::姓名',
+	secmanager_officer_title varchar(255) null comment '网站安全::管理人员::职位',
+	secmanager_officer_phone varchar(255) null comment '网站安全::管理人员::联系电话',
+	supporter_name varchar(255) null comment '支撑单位::名称',
+	supporter_officer_name varchar(255) null comment '支撑单位::责任人',
+	supporter_officer_title varchar(255) null comment '支撑单位::职务',
+	supporter_officer_phone varchar(255) null comment '支撑单位::联系电话',
+	china_icp_code varchar(255) null comment '工信部ICP备案号',
+	police_network_code varchar(255) null comment '公安互联网备案号',
+	supervisor_level varchar(255) null comment '隶属关系：central中央，province省(自治区、直辖市)，city地(区、市、州、盟)，county县（区、市、旗）',
+	supervisor_level_other varchar(255) null comment '隶属关系 其他',
+	classified bit default b'0' null comment '是否定级',
+	classified_level varchar(32) null comment '系统保护级别',
+	classified_number varchar(64) null comment '等保备案号',
+	certificated bit default b'0' null comment '是否测评',
+	certificated_by varchar(64) null comment '测评公司',
+	certificated_at datetime null comment '测评时间',
+	safety_contract_signed int null comment '是否已签订安全责任书:  1是，0否',
+	safety_contract_file varchar(255) null comment '责任书附件',
+	service_item varchar(1000) null comment '服务栏目，直接填写，逗号隔开',
+	service_item_other varchar(255) null comment '服务栏目 其他',
+	is_oncloud int null comment '是否加入绍兴市电子政务云 1是 0不是',
+	dns_name_contact varchar(255) null comment '域名注册服务机构::名称 联系方式(弃用)',
+	dns_name varchar(255) null comment '域名注册服务机构::名称',
+	dns_contact varchar(255) null comment '域名注册服务机构::联系方式',
+	dns_record_ns varchar(255) null comment '.cn域名的NS记录',
+	dns_record_a varchar(255) null comment '.cn域名的A记录',
+	ip_range varchar(255) null comment '主站IP地址范围',
+	protocol_port varchar(255) null comment '主要协议/端口(弃用)',
+	protocol varchar(255) null comment '主要协议',
+	port varchar(255) null comment '主要端口',
+	operating_system varchar(255) null comment '操作系统版本',
+	isp_name_contact varchar(255) null comment '接入运营商::名称 联系方式(弃用)',
+	isp_name varchar(255) null comment '接入运营商::名称',
+	isp_contact varchar(255) null comment '接入运营商::联系方式',
+	isp_address varchar(255) null comment '物理接入位置',
+	isp_bandwidth varchar(255) null comment '接入带宽',
+	cdn_ip_range varchar(255) null comment 'CDN IP地址范围',
+	cdn_name varchar(255) null comment 'CDN 服务提供商',
+	cdn_contact_name varchar(255) null comment 'CDN 联系人姓名',
+	cdn_contact_mobile varchar(255) null comment 'CDN 联系人手机号',
+	submitted_by int null comment '上报人ID',
+	submitted_at datetime null comment '上报时间',
+	created_by int not null comment '创建人',
+	created_at datetime not null comment '创建时间',
+	error_params text null comment '错误的字段',
+	reject_reason varchar(1000) null comment '驳回原因',
+	approve_status varchar(255) null comment '审批阶段，edit编辑，industry-approve行业主管待审批，industry-accept行业主管通过，industry-reject行业主管驳回，police-approve网警待审批，police-accept网警通过，police-reject网警驳回',
+	current_point varchar(255) null comment '当前节点，industry行业主管，police网警',
+	risk_assessment_file varchar(255) null comment '风险评估报告书',
+	is_oncluster int null comment '是否加入网站集群： 1->是 0->不是',
+	web_attr varchar(255) null comment '网站属性：main->主站 sub->子站',
+	is_open int null comment '是否开启 1是 0否',
+	open_date datetime null comment '开启时间',
+	close_date datetime null comment '关闭时间',
+	is_key_system int null comment '是否是关键信息基础设施 0:不是，1:是',
+	system_code varchar(255) null comment '系统编号',
+	is_deleted int null comment '是否删除',
+	deleted_reason varchar(255) null comment '删除原因',
+	deleted_date datetime null comment '删除时间'
+)
+comment '等级保护::关键信息系统' charset=utf8
+;
+
+create table biz_sp_website_dirty
+(
+	id int auto_increment
+		primary key,
+	address varchar(255) null comment '网站所在地',
+	approve_status varchar(255) null comment '审批阶段',
+	area_id int null comment '区域id',
+	cdn_contact_mobile varchar(255) null comment 'CDN 联系人手机号',
+	cdn_contact_name varchar(255) null comment 'CDN 联系人姓名',
+	cdn_ip_range varchar(255) null comment 'CDN IP地址范围',
+	cdn_name varchar(255) null comment 'CDN 服务提供商',
+	certificated bit default b'0' null comment '是否测评',
+	certificated_at datetime null comment '测评时间',
+	certificated_by varchar(64) null comment '测评公司',
+	china_icp_code varchar(255) null comment '工信部ICP备案号',
+	classified bit default b'0' null comment '是否定级',
+	classified_level varchar(32) null comment '系统保护级别',
+	classified_number varchar(64) null comment '等保备案号',
+	close_date datetime null comment '关闭时间',
+	created_at datetime null comment '创建时间',
+	created_by int null comment '创建人ID',
+	current_point varchar(255) null comment '当前节点',
+	dns_contact varchar(255) null comment '域名注册服务机构::联系方式',
+	dns_name varchar(255) null comment '域名注册服务机构::名称',
+	dns_name_contact varchar(255) null comment '域名注册服务机构::名称(弃用)',
+	dns_record_a varchar(255) null comment '.cn域名的A记录',
+	dns_record_ns varchar(255) null comment '.cn域名的NS记录',
+	domain_name varchar(255) null comment '域名',
+	error_params text null comment '错误的字段',
+	industry_id int null comment '行业id',
+	ip varchar(255) null comment 'ip',
+	ip_range varchar(255) null comment '主站IP地址范围',
+	is_key_system int null comment '是否是关键信息系统',
+	is_oncloud int null comment '是否加入绍兴电子政务云',
+	is_oncluster int null comment '是否加入网站集群',
+	is_open int null comment '是否开启',
+	isp_address varchar(255) null comment '物理接入位置',
+	isp_bandwidth varchar(255) null comment '接入带宽',
+	isp_contact varchar(255) null comment '接入运营商::联系方式',
+	isp_name varchar(255) null comment '接入运营商::名称',
+	isp_name_contact varchar(255) null comment '接入运营商::名称 联系方式(弃用)',
+	name varchar(128) not null comment '网站名称',
+	open_date datetime null comment '开启时间',
+	operating_system varchar(255) null comment '操作系统版本',
+	operator_name varchar(255) null comment '责任单位::名称',
+	operator_officer_name varchar(255) null comment '责任单位::负责人::姓名',
+	operator_officer_phone varchar(255) null comment '责任单位::负责人::联系电话',
+	operator_officer_title varchar(255) null comment '责任单位::负责人::职务',
+	ouname varchar(128) null comment '单位名称',
+	owner_id int not null comment '所属业主单位',
+	police_network_code varchar(255) null comment '公安互联网备案号',
+	port varchar(255) null comment '主要端口',
+	protocol varchar(255) null comment '主要协议',
+	protocol_port varchar(255) null comment '主要协议/端口(弃用)',
+	reject_reason text null comment '驳回原因',
+	risk_assessment_file varchar(255) null comment '风险评估报告书',
+	safety_contract_file varchar(255) null comment '责任书附件',
+	safety_contract_signed int null comment '是否已签订安全责任书',
+	secmanager_officer_name varchar(255) null comment '网站安全::管理人::姓名',
+	secmanager_officer_phone varchar(255) null comment '网站安全::管理人::联系电话',
+	secmanager_officer_title varchar(255) null comment '网站安全::管理人::职务',
+	service_item varchar(1000) null comment '服务栏目',
+	service_item_other varchar(255) null comment '服务栏目其他',
+	submitted_at datetime null comment '上报时间',
+	submitted_by int null comment '上报人ID',
+	supervisor_level varchar(255) null comment '隶属关系',
+	supervisor_level_other varchar(255) null comment '隶属关系 其他',
+	supporter_name varchar(255) null comment '支撑单位::名称',
+	supporter_officer_name varchar(255) null comment '支撑单位::责任人::名称',
+	supporter_officer_phone varchar(255) null comment '支撑单位::责任人::电话',
+	supporter_officer_title varchar(255) null comment '支撑单位::责任人::职务',
+	system_code varchar(255) null comment '系统编号',
+	web_attr varchar(255) null comment '网站属性',
+	web_status varchar(255) null comment '网站状态 good正常 error异常'
+)
+;
+
+create table biz_sp_website_isopen_detail
+(
+	id int auto_increment
+		primary key,
+	sp_website_id int null comment '网站id',
+	create_user_id int null comment '创建人id',
+	created_date datetime null comment '创建时间',
+	is_open int null comment '是否开启 1是 0否'
+)
+comment '网站启停操作记录' charset=utf8
+;
+
+create table biz_sp_website_operation
+(
+	id int auto_increment
+		primary key,
+	edit_additional text null comment '附加信息',
+	operated_at datetime null comment '操作时间',
+	operated_by int null comment '操作人id',
+	operated_type varchar(255) null comment '操作类型',
+	website_id int null comment '网站id'
+)
+;
+
+create table biz_sys_sec_question_answer
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	existIssue varchar(255) null comment '发现问题 n未发现 y发现',
+	feedbackAnswerAll mediumtext null comment '反馈答案 json列表 包含题目和答案',
+	issueFixed varchar(255) null comment '修复问题 n未修复 y已修复',
+	ownerDeptId int null comment '业主单位id',
+	ownerSystemId int null comment '业主系统id',
+	ownerSystemType varchar(255) null comment '系统类型',
+	submitDate datetime null comment '提交时间',
+	submitUserId int null comment '提交人id',
+	submitUserName varchar(255) null comment '提交人名字',
+	existIssueCount int null comment '发现问题 数量',
+	issueFixedCount int null comment '整改问题 数量',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间'
+)
+;
+
+create table biz_sys_sec_question_catalog
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	sortOrder int null comment '排序号',
+	systemType varchar(255) not null comment '系统类型',
+	title varchar(255) not null comment '标题-大题',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间'
+)
+;
+
+create table biz_sys_sec_question_item
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	catalogId int not null comment '大题id',
+	sortOrder int null comment '排序号',
+	title varchar(255) not null comment '标题-小题',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间'
+)
+;
+
+create table biz_untamper
+(
+	id int auto_increment
+		primary key,
+	website_id int null comment '网站id',
+	website_name varchar(200) null comment '网站名称',
+	website_url varchar(100) null comment '网站域名',
+	target_ip varchar(100) null comment '目的IP',
+	happened_time datetime null comment '篡改时间',
+	url varchar(100) null comment 'URL/目录',
+	action varchar(100) null comment '防御动作',
+	danger_level varchar(100) null comment '威胁程度',
+	harm_detail varchar(1000) null comment '危害说明',
+	description varchar(1000) null comment '描述'
+)
+comment '网页防篡改' charset=utf8
+;
+
+create table biz_usability_executor
+(
+	id int auto_increment
+		primary key,
+	user_id int not null comment '执行人id',
+	us_id int not null comment '可用性id'
+)
+comment '可用性执行表' charset=utf8
+;
+
+create table biz_usability_step
+(
+	id int auto_increment
+		primary key,
+	us_id int not null comment '可用性id',
+	pxh int not null comment '排序号',
+	clfs int not null comment '1、开始处理      （处理中）
+            2、处理完毕      （待复核）     
+            3、复核存在      （待处理）     
+            4、复核不存在  （已修复）          
+            5、发送预警单            
+            6、查看预警单            
+            7、发送处置单            
+            8、查看处理单   
+',
+	clrid int not null comment '处理人id',
+	clsj datetime not null comment '处理时间',
+	cljg varchar(300) not null comment '处理结果',
+	isdel int not null comment '是否删除',
+	create_date datetime not null comment '创建时间',
+	update_date datetime null comment '修改时间',
+	create_user int not null comment '创建用户',
+	update_user int null comment '修改用户',
+	resolvement varchar(1000) null
+)
+comment '可用性处置表' charset=utf8
+;
+
+create table biz_vulnerability_executor
+(
+	vue_id int auto_increment
+		primary key,
+	vue_user_id int not null comment '执行人id',
+	vue_vulnerability_id int not null comment '漏洞id'
+)
+comment '漏洞执行表' charset=utf8
+;
+
+create table biz_vulnerability_step
+(
+	vus_id int auto_increment
+		primary key,
+	vus_vulnerability_id int not null comment '漏洞id',
+	vus_pxh int not null comment '排序号',
+	vus_clfs int null comment ' 
+1、开始处理            
+2、处理完毕            
+3、复核存在            
+4、复核不存在            
+5、发送预警单            
+6、查看预警单            
+7、发送处置单            
+8、查看处理单            
+',
+	vus_clrid int not null comment '处理人id',
+	vus_clsj datetime not null comment '处理时间',
+	vus_cljg varchar(300) not null comment '处理结果',
+	vus_isdel int not null comment '是否删除',
+	vus_create_date datetime not null comment '创建时间',
+	vus_update_date datetime null comment '修改时间',
+	vus_create_user int not null comment '创建用户',
+	vus_update_user int null comment '修改用户',
+	vus_resolvement varchar(1000) null
+)
+comment '漏洞处置表' charset=utf8
+;
+
+create table biz_waf
+(
+	id int auto_increment
+		primary key,
+	website_id int null comment '网站id',
+	website_name varchar(200) null comment '网站名称',
+	website_url varchar(100) null comment '网站域名',
+	target_ip varchar(100) null comment '目的IP',
+	type varchar(100) null comment '攻击类型',
+	happened_time datetime null comment '攻击时间',
+	source_ip varchar(100) null comment '攻击源IP',
+	src_ip_area varchar(100) null comment '攻击源归属地',
+	danger_level varchar(100) null comment '严重等级',
+	action varchar(100) null comment '防御动作',
+	harm_detail text null comment '危害说明',
+	description varchar(1000) null comment '描述',
+	url varchar(1000) null comment 'URL/目录'
+)
+comment 'web应用防护' charset=utf8
+;
+
+create table biz_website
+(
+	website_id int auto_increment
+		primary key,
+	website_name varchar(120) not null comment '网站名称',
+	website_url varchar(1000) null comment 'url',
+	hy_id int not null comment '归属行业',
+	qy_id int not null comment '归属区域',
+	dept_id int not null comment '归属业主单位',
+	website_state int not null comment '是否正常',
+	website_isdel int not null comment '是否删除',
+	website_py varchar(120) null comment '拼音缩写',
+	website_wb varchar(120) null comment '五笔缩写',
+	website_create_date datetime not null comment '创建时间',
+	website_update_date datetime null comment '修改时间',
+	website_create_user int not null comment '创建人',
+	website_update_user int null comment '修改人',
+	is_point int null comment '是否重点网站：1 是，0 否',
+	smdw_id int null,
+	yzdw_id int null,
+	website_dns varchar(300) null,
+	website_yfy_date datetime null comment '云防御结束日期',
+	web_assign_total int null comment '网站分配的总次数',
+	biz_sp_website_id int null comment '对应的备案登记的网站id'
+)
+comment '网站表' charset=utf8
+;
+
+create table biz_website_scan_download
+(
+	id int auto_increment comment '表id'
+		primary key,
+	website_id int not null comment '网站id',
+	stat varchar(255) null comment '状态 rotate：已自动轮换，assign：已手动分配， download：已经下载过，modified：变更后未下载',
+	rotate_time datetime null comment '轮换时间',
+	assign_time datetime null comment '分配时间',
+	download_time datetime null comment '下载时间',
+	modified_time datetime null comment '编辑时间',
+	constraint website_id
+		unique (website_id) comment '每个网站一条数据'
+)
+comment '扫描单位下载记录，网站每次轮换置为轮换，每次分配的时候置为分配，扫描单位点击下载后置为下载，编辑后置为变更' charset=utf8
+;
+
+create table clouddefense_maliceips
+(
+	id int auto_increment
+		primary key,
+	source_ip varchar(100) null comment '攻击源ip',
+	status int null comment '
+   0、未封堵
+   1、已封堵
+'
+)
+comment '恶意ip信息表' charset=utf8
+;
+
+create table clouddefense_maliceips_action
+(
+	id int auto_increment
+		primary key,
+	doc_id int null comment '单击id',
+	source_ip varchar(100) null comment '恶意ips',
+	status int null comment '1、未封堵2、封堵',
+	action_time datetime null comment '操作时间',
+	apply_time datetime null comment '申请时间',
+	ip_id varchar(255) null
+)
+comment '恶意ip单据操作流程表' charset=utf8
+;
+
+create table clouddefense_maliceips_doc
+(
+	id int auto_increment
+		primary key,
+	status int null comment '
+   0 、处理中 (封堵)1、处理中(撤销)
+   2、部分处理(封堵)3、部分处理(撤销)
+   4、全部处理(封堵)5、全部处理(撤销)
+   6、全部未处理(封堵)7、全部未处理(撤销)
+',
+	action_time datetime null comment '操作时间',
+	apply_time datetime null comment '申请时间'
+)
+comment '恶意ip单据表' charset=utf8
+;
+
+create table clouddefense_weblist_detail
+(
+	id int auto_increment
+		primary key,
+	website_id int null comment '网站id',
+	doc_id int null comment '云防御单据id'
+)
+comment '云防御申请详情' charset=utf8
+;
+
+create table clouddefense_weblist_doc
+(
+	id int auto_increment
+		primary key,
+	status int null comment '
+   0、处理中
+   1、启用 2、启用失败
+',
+	apply_level varchar(100) null comment '等级',
+	apply_len int null comment '申请时长',
+	start_time datetime null comment '启用时间',
+	apply_time datetime null comment '申请时间'
+)
+comment '云防御单据表' charset=utf8
+;
+
+create table dictionary_class
+(
+	class_id int auto_increment
+		primary key,
+	class_name varchar(120) not null comment '分类名称',
+	class_code varchar(120) not null comment '分类编码',
+	class_parent_id int not null comment '上级分类id',
+	class_type int not null comment '分类类型',
+	class_sort int not null comment '创建时间',
+	class_search_code varchar(300) not null comment '查询码',
+	class_full_name varchar(600) not null comment '全路径',
+	class_isdel int not null comment '是否删除',
+	class_remark varchar(600) null comment '备注',
+	class_py varchar(120) null comment '拼音缩写',
+	class_wb varchar(120) null comment '五笔缩写',
+	class_create_date datetime not null comment '创建时间',
+	class_update_date datetime null comment '修改时间',
+	class_create_user int not null comment '创建人',
+	class_update_user int null comment '修改人'
+)
+comment '项目分类表' charset=utf8
+;
+
+create table dictionary_item
+(
+	item_id int auto_increment
+		primary key,
+	item_name varchar(1000) null,
+	item_code varchar(120) null comment '项目编码',
+	item_parent_id int not null comment '上级项目id',
+	item_class_code varchar(120) not null comment '分类code',
+	item_type int not null comment '项目类型',
+	item_sort int not null comment '排序号',
+	item_search_code varchar(300) not null comment '查询码',
+	item_full_name varchar(3000) null,
+	item_isdel int not null comment '是否删除',
+	item_remark varchar(600) null comment '备注',
+	item_py varchar(3000) null comment '拼音缩写',
+	item_wb varchar(3000) null comment '五笔缩写',
+	item_create_date datetime not null comment '创建时间',
+	item_update_date datetime null comment '修改时间',
+	item_create_user int not null comment '创建人',
+	item_update_user int null comment '修改人'
+)
+comment '字典项目' charset=utf8
+;
+
+create table grade_protect_dr_info
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	attachment_name varchar(255) null comment '附件名称',
+	attachment_path varchar(255) null comment '附件地址',
+	building_situation text null comment '灾备建设情况',
+	delete_status tinyint(2) null comment '状态信息 0以删除, 1未删除',
+	grade_protect_unit_id int null comment '备案单位id',
+	grade_protect_unit_name varchar(255) null comment '备案单位名称',
+	leader varchar(255) null comment '责任领导',
+	leader_dept varchar(255) null comment '责任领导所在部门',
+	leader_post varchar(255) null comment '责任领导的职务',
+	manager varchar(255) null comment '直接负责人',
+	manager_dept varchar(255) null comment '直接负责人所属部门',
+	name varchar(255) null comment '标题',
+	recovery_level tinyint(2) null comment '灾备恢复能力等级',
+	running_situation text null comment '灾备系统和灾备中心运行情况',
+	use_and_protect text null comment '灾备系统使用与维护信息'
+)
+;
+
+create table grade_protect_dr_plan
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	delete_status tinyint(2) null comment '状态信息 0以删除, 1未删除',
+	grade_protect_dr_info_ids varchar(255) null comment '灾备基本信息的ID(逗号分隔)',
+	grade_protect_dr_info_names varchar(255) null comment '灾备基本信息的名称(逗号分隔)',
+	grade_protect_system_ids varchar(255) null comment '备案信息系统的ID(逗号分隔)',
+	grade_protect_system_names varchar(255) null comment '备案信息系统的名称(逗号分隔)',
+	grade_protect_unit_id int null comment '备案单位id',
+	grade_protect_unit_name varchar(255) null comment '备案单位名称',
+	is_exercised varchar(5) null comment '是否演练:是/否',
+	is_reviewed varchar(5) null comment '是否评审:是/否',
+	is_tested varchar(5) null comment '是否测试:是/否',
+	name varchar(255) null comment '状态信息',
+	purpose text null comment '预案目的'
+)
+;
+
+create table grade_protect_dr_plan_info
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	grade_protect_dr_info_id int not null comment '灾备信息ID',
+	grade_protect_dr_info_name varchar(255) null comment '灾备信息名称',
+	grade_protect_dr_plan_id int not null comment '灾备预案ID',
+	grade_protect_dr_plan_name varchar(255) null comment '灾备预案名称'
+)
+;
+
+create table grade_protect_dr_plan_system
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	grade_protect_dr_plan_id int not null comment '灾备预案ID',
+	grade_protect_dr_plan_name varchar(255) null comment '灾备预案名称',
+	grade_protect_system_id int not null comment '备案系统ID',
+	grade_protect_system_name varchar(255) null comment '备案系统名称'
+)
+;
+
+create table grade_protect_evaluation
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	delete_status int not null comment '是否已删除 *前端不用传 0已删除 1未删除',
+	duty_dept_mail varchar(30) null comment '责任部门 电子邮件',
+	duty_dept_man_name varchar(30) null comment '责任部门 姓名',
+	duty_dept_name varchar(30) null comment '责任部门 名称',
+	duty_dept_phone varchar(30) null comment '责任部门 移动电话',
+	duty_dept_position varchar(10) null comment '责任部门 职务/职称',
+	duty_dept_tel varchar(30) null comment '责任部门 办公电话',
+	eval_dept_address varchar(100) null comment '测评单位 通信地址',
+	eval_dept_cert_number varchar(100) null comment '测评单位 资质编号',
+	eval_dept_man_name varchar(10) null comment '测评单位 联系人姓名',
+	eval_dept_man_position varchar(10) null comment '测评单位 职务/职称',
+	eval_dept_name varchar(30) null comment '测评单位 测评单位名称',
+	eval_dept_parent_dept varchar(30) null comment '测评单位 所属部门',
+	eval_dept_parent_mail varchar(30) null comment '测评单位 电子邮件',
+	eval_dept_parent_mobile varchar(30) null comment '测评单位 移动电话',
+	eval_dept_parent_tel varchar(30) null comment '测评单位 办公电话',
+	eval_dept_zip_code varchar(10) null comment '测评单位 邮政编码',
+	grade_system_lv int null comment '安全保护等级 级别 数字: 1/2/3/4',
+	report_accept_man varchar(10) null comment '报告信息 批准人',
+	report_accept_time datetime null comment '报告信息 批准日期',
+	report_approve_man varchar(10) null comment '报告信息 审核人',
+	report_approve_time datetime null comment '报告信息 审核日期',
+	report_create_man varchar(10) null comment '报告信息 编制人',
+	report_create_time datetime null comment '报告信息 编制日期',
+	report_expiry_date datetime null comment '报告信息 有效期',
+	report_file_name varchar(100) null comment '报告信息 测评报告 文件',
+	report_number varchar(100) null comment '报告信息 报告编号',
+	report_submit_time datetime null comment '报告信息 报告时间',
+	system_cert_number varchar(50) null comment '信息系统情况 备案证明编号',
+	system_grade_conclusion varchar(15) null comment '信息系统情况 测评结论 直接中文：符合、基本符合、不符合',
+	system_id int null comment '信息系统情况 系统id *后台生成',
+	system_name varchar(60) null comment '信息系统情况 系统名称',
+	unit_address varchar(100) null comment '单位地址',
+	unit_id int null comment '被测单位 单位id',
+	unit_name varchar(30) null comment '单位名称',
+	unit_zip_code varchar(30) null comment '邮编'
+)
+;
+
+create table grade_protect_rectification
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	address varchar(255) null comment '实施单位地址',
+	after_assess_number varchar(255) null comment '整改后测评报告编号',
+	after_assess_result text null comment '整改后测评结果',
+	assess_suggestion text null comment '整改评审意见',
+	attachment_name varchar(255) null comment '整改附件名称',
+	attachment_path varchar(255) null comment '整改附件',
+	basis varchar(255) null comment '整改依据(等级测评/安全检查/自查)',
+	before_assess_number varchar(255) null comment '整改前对应测评编号',
+	before_assess_result text null comment '整改前测评结果',
+	cause text null comment '整改原因',
+	check_result text null comment '安全检查结论',
+	contact varchar(255) null comment '实施单位联系人',
+	delete_status tinyint(2) null comment '是否删除状态，0已删除，1未删除',
+	email varchar(255) null comment '联系人电子邮箱',
+	end_time datetime null comment '整改结束日期',
+	feed_back_name varchar(255) null comment '反馈意见书-附件名称',
+	feed_back_path varchar(255) null comment '反馈意见书-附件地址',
+	grade_protect_system_id int null comment '备案信息系统ID',
+	grade_protect_system_name varchar(255) null comment '备案信息系统名称',
+	grade_protect_unit_id int null comment '备案单位ID',
+	grade_protect_unit_name varchar(255) null comment '备案单位名称',
+	impl_status varchar(255) null comment '整改实施状态  未实施/正在实施/实施完成',
+	impl_unit varchar(255) null comment '整改实施单位',
+	is_assess varchar(255) null comment '整改后是否经过测评: 是/否',
+	manager varchar(255) null comment '整改负责人',
+	mobile varchar(255) null comment '联系人移动电话',
+	name varchar(255) null comment '整改标题',
+	phone varchar(255) null comment '联系人电话',
+	plan text null comment '整改方案简述',
+	self_check_result text null comment '自查结论',
+	start_time datetime null comment '整改开始日期'
+)
+;
+
+create table grade_protect_regulation
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	assert_name varchar(255) null,
+	assert_path varchar(255) null,
+	catalog varchar(255) null,
+	description varchar(255) null,
+	name varchar(255) null,
+	publish_time datetime(6) null,
+	reference_number varchar(255) null,
+	sort_order int null
+)
+;
+
+create table grade_protect_system
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	business_desc varchar(600) null comment '业务描述',
+	delete_status int not null comment '是否已删除 *前端不用传 0已删除 1未删除',
+	form_creator_name varchar(50) null comment '填表人',
+	form_creator_time datetime null comment '填表时间',
+	gov_aqzrs_name varchar(50) null comment '政府网站安全责任书 文件名',
+	gov_djpc varchar(15) null comment '政府网站安全工作情况 等级测评 直接中文 值：已开展/未开展',
+	gov_duty_manager varchar(50) null comment '政府网站安全工作情况 网站责任单位负责人及职务',
+	gov_duty_manager_phone varchar(50) null comment '政府网站安全工作情况 网站责任单位负责人 联系电话',
+	gov_duty_unit_address varchar(300) null comment '政府网站安全工作情况 网站负责单位所在地',
+	gov_duty_unit_name varchar(60) null comment '政府网站安全工作情况 网站责任单位',
+	gov_grade_lv int null comment '政府网站安全工作情况 等级保护定级备案 值：0/1/2/3/4 0表示未定级',
+	gov_has_aqzrs varchar(15) null comment '政府网站安全责任书 直接中文 内容：已签订/未签订',
+	gov_icp varchar(30) null comment '政府网站安全工作情况 工信部ICP备案号',
+	gov_internet_icp varchar(30) null comment '政府网站安全工作情况 国际联网备案号',
+	gov_ip varchar(25) null comment '政府网站安全工作情况 IP地址',
+	gov_is_gov_web varchar(3) null comment '是否为政府网站 直接中文 内容：是/否',
+	gov_protect varchar(50) null comment '政府网站安全工作情况 网站防护技术措施 直接中文 多个逗号隔开',
+	gov_protect_asserts varchar(600) null comment '政府网站安全工作情况 网站防护技术措施 多个文件 逗号隔开',
+	gov_run_manager varchar(60) null comment '政府网站安全工作情况 网站运行安全责任人及职务',
+	gov_run_manager_phone varchar(60) null comment '政府网站安全工作情况 网站运行安全责任人及职务 联系电话',
+	gov_run_unit_name varchar(60) null comment '政府网站安全工作情况 网站运行单位',
+	gov_service_category varchar(100) null comment '政府网站安全工作情况 网站服务栏目',
+	gov_service_category_other varchar(30) null comment '政府网站安全工作情况 网站服务栏目 其他',
+	gov_url varchar(200) null comment '政府网站安全工作情况 网址',
+	gov_web_name varchar(60) null comment '政府网站安全工作情况 网站中文名称',
+	grade3_file_glzd_name varchar(50) null comment '系统安全组织机构及管理制度 文件名',
+	grade3_file_pcbg_name varchar(50) null comment '系统等级测评报告 文件名',
+	grade3_file_psqk_name varchar(50) null comment '专家评审情况 文件名',
+	grade3_file_spyj_name varchar(50) null comment '上级主管部门审批意见 文件名',
+	grade3_file_ssfa_name varchar(50) null comment '系统安全保护设施设计实施方案或改建实施方案 文件名',
+	grade3_file_xkzm_name varchar(50) null comment '使用的安全产品清单及认证、销售许可证名 文件名',
+	grade3_file_xttp_name varchar(50) null comment '系统拓扑结果及说明 文件名',
+	grade3_has_file_glzd varchar(3) null comment '系统安全组织机构及管理制度 直接中文 内容：有/无',
+	grade3_has_file_pcbg varchar(3) null comment '系统等级测评报告 直接中文 内容：有/无',
+	grade3_has_file_psqk varchar(3) null comment '专家评审情况 直接中文 内容：有/无',
+	grade3_has_file_spyj varchar(3) null comment '上级主管部门审批意见 直接中文 内容：有/无',
+	grade3_has_file_ssfa varchar(3) null comment '系统安全保护设施设计实施方案或改建实施方案 直接中文 内容：有/无',
+	grade3_has_file_xkzm varchar(3) null comment '使用的安全产品清单及认证、销售许可证名 直接中文 内容：有/无',
+	grade3_has_file_xttp varchar(3) null comment '系统拓扑结果及说明 直接中文 内容：有/无',
+	grade_business_info_lv int null comment '业务信息安全保护等级 级别 数组: 1/2/3/4/5',
+	grade_business_info_lv_group1 int null comment '业务信息安全保护等级 损害体及损害程度 第1组选项 选第几个 数字：1/2/3',
+	grade_business_info_lv_group2 int null comment '业务信息安全保护等级 损害体及损害程度 第2组选项 选第几个 数字：1/2/3',
+	grade_business_info_lv_group3 int null comment '业务信息安全保护等级 损害体及损害程度 第3组选项 选第几个 数字：1/2/3',
+	grade_has_leader_dept varchar(3) null comment '信息系统定级情况 是否有主管部门 直接中文 内容：有/无',
+	grade_has_lv_report varchar(3) null comment '信息系统定级情况 系统定级报告 直接中文 内容：有/无',
+	grade_has_review varchar(15) null comment '信息系统定级情况 专家评审情况 直接中文 内容：已评审/未评审',
+	grade_leader_dept_has_review varchar(15) null comment '信息系统定级情况 主管部门审批定级情况 直接中文 内容：已评审/未评审',
+	grade_leader_dept_name varchar(60) null comment '信息系统定级情况 主管部门名称',
+	grade_lv_report_name varchar(50) null comment '信息系统定级情况 系统定级报告 文件名',
+	grade_system_lv int null comment '信息系统安全保护等级 级别 数字: 1/2/3/4/5',
+	grade_system_service_lv int null comment '系统服务安全保护等级 级别 数组: 1/2/3/4/5',
+	grade_system_service_lv_group1 int null comment '系统服务安全保护等级 损害体及损害程度 第1组选项 选第几个 数字：1/2/3',
+	grade_system_service_lv_group2 int null comment '系统服务安全保护等级 损害体及损害程度 第2组选项 选第几个 数字：1/2/3',
+	grade_system_service_lv_group3 int null comment '系统服务安全保护等级 损害体及损害程度 第3组选项 选第几个 数字：1/2/3',
+	grade_time datetime null comment '信息系统定级情况 定级时间',
+	interconnect_type varchar(80) null comment '系统互联情况 直接中文 存储内容：与其他行业系统相连/与本行业其他单位系统相连/与本单位其他系统相连',
+	interconnect_type_other varchar(30) null comment '系统互联情况 其他 直接中文',
+	key_product_db_count int null comment '关键产品使用情况 数据库 数量',
+	key_product_db_percent int null comment '关键产品使用情况 数据库 使用率',
+	key_product_db_use varchar(50) null comment '关键产品使用情况 数据库 直接中文 存储内容：全部使用/全部未使用/部分使用',
+	key_product_net_count int null comment '关键产品使用情况 网络产品 数量',
+	key_product_net_percent int null comment '关键产品使用情况 网络产品 使用率',
+	key_product_net_use varchar(50) null comment '关键产品使用情况 网络产品 直接中文 存储内容：全部使用/全部未使用/部分使用',
+	key_product_os_count int null comment '关键产品使用情况 操作系统 数量',
+	key_product_os_percent int null comment '关键产品使用情况 操作系统 使用率',
+	key_product_os_use varchar(50) null comment '关键产品使用情况 操作系统 直接中文 存储内容：全部使用/全部未使用/部分使用',
+	key_product_other_count int null comment '关键产品使用情况 其他 数量',
+	key_product_other_percent int null comment '关键产品使用情况 其他 使用率',
+	key_product_other_use varchar(50) null comment '关键产品使用情况 其他 直接中文 存储内容：全部使用/全部未使用/部分使用',
+	key_product_security_count int null comment '关键产品使用情况 安全专用产品 数量',
+	key_product_security_percent int null comment '关键产品使用情况 安全专用产品 使用率',
+	key_product_security_use varchar(50) null comment '关键产品使用情况 安全专用产品 直接中文 存储内容：全部使用/全部未使用/部分使用',
+	key_product_server_count int null comment '关键产品使用情况 服务器 数量',
+	key_product_server_percent int null comment '关键产品使用情况 服务器 使用率',
+	key_product_server_use varchar(50) null comment '关键产品使用情况 服务器 直接中文 存储内容：全部使用/全部未使用/部分使用',
+	net_type varchar(40) null comment '网络性质 直接中文 存储内容：业务专网/互联网',
+	net_type_other varchar(30) null comment '网络性质 其他 直接中文',
+	serve_area varchar(80) null comment '服务范围 直接中文 多个逗号隔开 存储内容：全国/跨省/全省/跨地/地',
+	serve_area_multi_city_count int null comment '服务范围 跨地 几个',
+	serve_area_multi_province_count int null comment '服务范围 是否跨省 几个',
+	serve_area_other varchar(30) null comment '服务范围 其他',
+	serve_scope varchar(50) null comment '覆盖范围 直接中文 多个逗号隔开 存储内容：局域网/城域网/广域网',
+	serve_scope_other varchar(30) null comment '覆盖范围 其他',
+	serve_target varchar(50) null comment '服务范围 服务对象 直接中文 多个逗号隔开 存储内容：单位内部人员/社会公众人员/两者均包括',
+	serve_target_other varchar(30) null comment '服务范围 服务对象 其他',
+	service_djcp_unit_name varchar(60) null comment '系统采用服务情况 等级测评单位名称',
+	service_in_use_time datetime null comment '系统采用服务情况 何时投入运行使用',
+	service_is_sub varchar(3) null comment '系统采用服务情况 系统是否是分系统 存储内容：是/否',
+	service_parent_sys_name varchar(60) null comment '系统采用服务情况 上级系统名称',
+	service_parent_unit_name varchar(60) null comment '系统采用服务情况 上级系统所属单位名称',
+	service_usage_aqpx_exist varchar(3) null comment '系统采用服务情况 安全培训 直接中文 有/无',
+	service_usage_aqpx_type varchar(75) null comment '系统采用服务情况 安全培训 系统类型 存储内容：本行业/国内其他服务商/国外服务商',
+	service_usage_aqzx_exist varchar(3) null comment '系统采用服务情况 安全资讯 直接中文 有/无',
+	service_usage_aqzx_type varchar(75) null comment '系统采用服务情况 安全资讯 系统类型 存储内容：本行业/国内其他服务商/国外服务商',
+	service_usage_djcp_exist varchar(3) null comment '系统采用服务情况 等级测评 直接中文 有/无',
+	service_usage_djcp_type varchar(75) null comment '系统采用服务情况 等级测评 系统类型 存储内容：本行业/国内其他服务商/国外服务商',
+	service_usage_fxpg_exist varchar(3) null comment '系统采用服务情况 风险评估 直接中文 有/无',
+	service_usage_fxpg_type varchar(75) null comment '系统采用服务情况 风险评估 系统类型 存储内容：本行业/国内其他服务商/国外服务商',
+	service_usage_other_exist varchar(3) null comment '系统采用服务情况 其他 直接中文 有/无',
+	service_usage_other_type varchar(75) null comment '系统采用服务情况 其他 系统类型 存储内容：本行业/国内其他服务商/国外服务商',
+	service_usage_xtjc_exist varchar(3) null comment '系统采用服务情况 系统集成 直接中文 有/无',
+	service_usage_xtjc_type varchar(75) null comment '系统采用服务情况 系统集成 系统类型 存储内容：本行业/国内其他服务商/国外服务商',
+	service_usage_yjxy_exist varchar(3) null comment '系统采用服务情况 应急响应 直接中文 有/无',
+	service_usage_yjxy_type varchar(75) null comment '系统采用服务情况 应急响应 系统类型 存储内容：本行业/国内其他服务商/国外服务商',
+	service_usage_znhf_exist varchar(3) null comment '系统采用服务情况 灾难恢复 直接中文 有/无',
+	service_usage_znhf_type varchar(75) null comment '系统采用服务情况 灾难恢复 系统类型 存储内容：本行业/国内其他服务商/国外服务商',
+	system_business_type varchar(100) null comment '信息系统情况 直接中文 业务类型 直接中文 多个逗号隔开',
+	system_business_type_other varchar(30) null comment '信息系统情况 直接中文 业务类型 其他',
+	system_cert_number varchar(50) null comment '信息系统情况 备案证明编号',
+	system_certified varchar(3) null comment '信息系统情况 是否已发备案证明 直接中文 值：是/否',
+	system_is_national varchar(3) null comment '信息系统情况 是否国家级系统 直接中文 值： 是/否',
+	system_is_prepare varchar(3) null comment '信息系统情况 系统是否预备案 直接中文 值： 是/否',
+	system_name varchar(60) null comment '信息系统情况 系统名称',
+	system_number varchar(50) null comment '信息系统情况 系统编号',
+	system_short_name varchar(30) null comment '信息系统情况 系统简称',
+	unit_id int null comment '备案单位 单位id *后台装配',
+	unit_name varchar(60) null comment '备案单位 单位名称',
+	unit_number varchar(50) null comment '备案单位 备案表编号',
+	disabled_status int not null comment '是否被撤销 0已撤销 1未撤销',
+	service_usage_other_name varchar(30) null comment '系统采用服务情况 其他 输入框的值'
+)
+;
+
+create table grade_protect_unit
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	accept_time datetime null comment '受理日期',
+	accept_unit_id int null comment '受理单位 关联',
+	belong_to varchar(255) null comment '隶属关系 中央 / 省 / 地 / 县',
+	belong_to_other varchar(255) null comment '隶属关系 其他',
+	delete_status int not null comment '是否已删除 *前端不用传 0已删除 1未删除',
+	duty_dept_mail varchar(255) null comment '责任部门 电子邮件',
+	duty_dept_man_name varchar(255) null comment '责任部门 姓名',
+	duty_dept_name varchar(255) null comment '责任部门 名称',
+	duty_dept_phone varchar(255) null comment '责任部门 移动电话',
+	duty_dept_position varchar(255) null comment '责任部门 职务/职称',
+	duty_dept_tel varchar(255) null comment '责任部门 办公电话',
+	industry_name varchar(255) null comment '行业类别',
+	industry_name_other varchar(255) null comment '行业类别 其他',
+	info_usage varchar(255) null comment '信息用途',
+	leader_mail varchar(255) null comment '电子邮件',
+	leader_name varchar(255) null comment '单位负责人 姓名',
+	leader_position varchar(255) null comment '单位负责人 职务/职称',
+	leader_tel varchar(255) null comment '单位负责人 办公电话',
+	number varchar(255) null comment '备案表编号',
+	record_time datetime null comment '备案日期',
+	region_code varchar(255) null comment '行政区划代码',
+	region_name varchar(255) null comment '行政区划',
+	unit_address varchar(255) null comment '单位地址',
+	unit_name varchar(255) null comment '单位名称',
+	unit_shot_name varchar(255) null comment '单位简称',
+	unit_type varchar(255) null comment '单位类型 党政机关 / 政府机关 / 事业单位 / 企业',
+	unit_type_other varchar(255) null comment '单位类型 其他',
+	unit_zip_code varchar(255) null comment '邮编',
+	accept_unit_name varchar(30) null comment '受理单位 名称',
+	disabled_status int not null comment '是否被撤销 0已撤销 1未撤销',
+	region_id int null comment '行政区划 id'
+)
+;
+
+create table hibernate_sequence
+(
+	next_val bigint null
+)
+;
+
+create table history_dnshijack
+(
+	dns_id int not null
+		primary key,
+	dns_domain varchar(255) not null comment '网站域名',
+	website_id int null comment '网站id',
+	dns_firm varchar(100) not null comment '厂商',
+	dns_device varchar(100) null comment '扫描设备',
+	dns_happened_time datetime not null comment '发生时间',
+	dns_lasthappened_time datetime null comment '最近发生时间',
+	dns_hjdns varchar(500) null comment '劫持后的dns',
+	dns_type varchar(300) null comment '劫持类型',
+	dns_status int not null comment '1、待验证            
+2、验证不存在            
+3、待处理（验证存在）            
+4、处理中            
+5、待复核            
+6、已修复            
+',
+	dns_biz_status int null comment '业务流转状态',
+	dns_solve_date datetime null,
+	dns_create_date datetime not null comment '创建时间',
+	dns_update_date datetime null comment '更新时间',
+	website_name varchar(300) null comment '网站名称',
+	cus_id int null comment '业主单位id',
+	cus_name varchar(300) null comment '业主单位名称',
+	hy_id int null comment '所属行业id',
+	hy_name varchar(300) null comment '所属行业名称',
+	qy_id int null comment '所属区域id',
+	qy_name varchar(300) null comment '所属区域名称',
+	yzdw_id int null comment '验证单位id',
+	yzdw_name varchar(300) null comment '验证单位名称',
+	smdw_id int null comment '扫描单位id'
+)
+comment 'DNS劫持历史表' charset=utf8
+;
+
+create table history_hiddenlink
+(
+	hid_id int not null
+		primary key,
+	hid_domain varchar(255) not null comment '网站域名',
+	hid_website_id int null comment '网站id',
+	hid_firm varchar(100) not null comment '厂商',
+	hid_device varchar(100) null comment '扫描设备',
+	hid_happened_time datetime not null comment '发生时间',
+	hid_lasthappened_time datetime null comment '最近发生时间',
+	hid_link varchar(500) null comment '暗链',
+	hid_pageurl varchar(255) null comment '暗链所在页面',
+	hid_description text null comment '暗链描述',
+	hid_suggest text null comment '修复建议',
+	hid_status int not null comment '1、待验证            
+2、验证不存在            
+3、待处理（验证存在）            
+4、处理中            
+5、待复核            
+6、已修复            
+',
+	hid_pic varchar(500) null comment '取证图片',
+	hid_type varchar(100) null,
+	hid_biz_status int null comment '业务流转状态',
+	hid_create_date datetime not null comment '创建时间',
+	hid_update_date datetime null comment '更新时间',
+	website_name varchar(300) null comment '网站名称',
+	cus_id int null comment '业主单位id',
+	cus_name varchar(300) null comment '业主单位名称',
+	hy_id int null comment '所属行业id',
+	hy_name varchar(300) null comment '所属行业名称',
+	qy_id int null comment '所属区域id',
+	qy_name varchar(300) null comment '所属区域名称',
+	yzdw_id int null comment '验证单位id',
+	yzdw_name varchar(300) null comment '验证单位名称',
+	smdw_id int null comment '扫描单位id',
+	hid_solve_date datetime null comment '修复时间'
+)
+comment '暗链历史表' charset=utf8
+;
+
+create table history_usability
+(
+	us_id int not null
+		primary key,
+	us_domain varchar(255) not null comment '网站域名',
+	us_website_id int null comment '网站ID',
+	us_firm varchar(100) not null comment '厂商',
+	us_device varchar(100) not null comment '扫描设备',
+	us_happened_time datetime not null comment '发生时间',
+	us_finshed_time datetime null comment '完成时间',
+	us_status int not null comment '可用性状态',
+	us_biz_status int null comment '业务状态',
+	us_description varchar(3000) null comment '原因',
+	us_create_date datetime not null comment '创建时间',
+	us_update_date datetime null comment '修改时间',
+	website_name varchar(300) null comment '网站名称',
+	cus_id int null comment '业主单位id',
+	cus_name varchar(300) null comment '业主单位名称',
+	hy_id int null comment '所属行业id',
+	hy_name varchar(300) null comment '所属行业名称',
+	qy_id int null comment '所属区域id',
+	qy_name varchar(300) null comment '所属区域名称',
+	yzdw_id int null comment '验证单位id',
+	yzdw_name varchar(300) null comment '验证单位名称',
+	smdw_id int null comment '扫描单位id'
+)
+comment '可用性表历史表' charset=utf8
+;
+
+create table history_vulnerability
+(
+	vul_id int not null
+		primary key,
+	vul_domain varchar(255) null comment '网站域名',
+	website_id int null comment '网站ID',
+	vul_firm varchar(100) null comment '扫描单位',
+	vul_device varchar(100) null comment '扫描设备ID',
+	vul_happened_time datetime null comment '第一次发生时间',
+	vul_lasthappened_time datetime null comment '最近一次发生时间',
+	vul_create_date datetime null comment '单据创建日期',
+	vul_update_date datetime null comment '单据更新日期',
+	vul_status int null comment '1、待验证            
+2、验证不存在            
+3、待处理（验证存在）            
+4、处理中            
+5、待复核            
+6、已修复            
+',
+	vul_biz_status int null comment '业务流转状态',
+	vul_url longtext null comment '漏洞发生页面',
+	vul_name varchar(255) null comment '漏洞名称',
+	vul_type varchar(255) null comment '漏洞类型',
+	vul_danger_level varchar(300) null comment '危害等级',
+	vul_description text null comment '漏洞描述',
+	vul_suggest text null comment '修复建议',
+	vul_harm text null comment '漏洞危害',
+	vul_solve_date datetime null comment '修复时间',
+	vul_website_name varchar(300) null comment '网站名称',
+	cus_id int null comment '业主单位id',
+	cus_name varchar(300) null comment '业主单位名称',
+	hy_id int null comment '所属行业id',
+	hy_name varchar(300) null comment '所属行业名称',
+	qy_id int null comment '所属区域id',
+	qy_name varchar(300) null comment '所属区域名称',
+	yzdw_id int null comment '验证单位id',
+	yzdw_name varchar(300) null comment '验证单位名称',
+	smdw_id int null comment '扫描单位id'
+)
+comment '漏洞历史表' charset=utf8
+;
+
+create table info_dnshijack
+(
+	dns_id int auto_increment
+		primary key,
+	dns_domain varchar(255) not null comment '域名',
+	website_id int null comment '网站id',
+	dns_firm varchar(100) not null comment '厂商',
+	dns_device varchar(100) not null comment '设备',
+	dns_hjdns varchar(255) not null comment '劫持后的dns',
+	dns_type varchar(300) null comment '劫持类型',
+	dns_happened_time datetime not null comment '第一次发生时间',
+	dns_lasthappened_time datetime not null comment '最近一次发生时间',
+	dns_create_date datetime not null comment '单据创建日期',
+	dns_update_date datetime null comment '单据更新日期',
+	dns_status int null comment '1、待验证
+2、验证不存在
+3、待处理（验证存在）
+4、处理中
+5、待复核
+6、已修复
+',
+	dns_biz_status int null comment '业务流转状态',
+	dns_solve_date datetime null comment '修复时间',
+	dns_rectify_date datetime null comment '整改日期',
+	smdw_id int null comment '扫描单位id',
+	dns_matchcode varchar(50) null
+)
+charset=utf8
+;
+
+create table info_hiddenlink
+(
+	hid_id int auto_increment
+		primary key,
+	hid_domain varchar(255) not null comment '网站域名',
+	hid_website_id int null,
+	hid_firm varchar(100) not null comment '厂商',
+	hid_device varchar(100) not null comment '扫描设备',
+	hid_happened_time datetime not null comment '发生时间',
+	hid_lasthappened_time datetime null,
+	hid_link varchar(500) not null comment '暗链',
+	hid_pageurl varchar(255) null comment '暗链所在页面',
+	hid_description text null comment '暗链描述',
+	hid_suggest text null comment '修复建议',
+	hid_status int null comment ' 
+1、待验证
+2、验证不存在
+3、待处理（验证存在）
+4、处理中
+5、待复核
+6、已修复    
+',
+	hid_biz_status int not null comment '业务流转状态',
+	hid_create_date datetime not null,
+	hid_update_date datetime null,
+	hid_pic varchar(500) null,
+	hid_type varchar(100) null,
+	hid_solve_date datetime null,
+	smdw_id int null comment '扫描单位id',
+	hid_matchcode varchar(50) null
+)
+charset=utf8
+;
+
+create table info_sensitive
+(
+	id int auto_increment
+		primary key,
+	domain varchar(255) null comment '网站地址',
+	website_id int not null comment '网站ID',
+	firm varchar(100) null comment '厂商',
+	device varchar(100) null comment '扫描设备',
+	happened_time datetime null comment '发生时间',
+	lasthappened_time datetime null comment '最近发生时间',
+	url varchar(500) null comment '发生页面',
+	keyword varchar(255) null comment '敏感字',
+	type varchar(255) null comment '敏感字类型',
+	level varchar(255) null comment '结果等级',
+	status int null comment '1:待验证 2:验证不存在 3:待处理（验证存在） 4:处理中 5:待复核 6:已修复',
+	biz_status int null comment '业务流转状态 默认0',
+	create_date datetime null,
+	update_date datetime null,
+	smdw_id int not null comment '扫描单位id',
+	matchcode varchar(50) null comment '特征值'
+)
+comment '敏感字' charset=utf8
+;
+
+create table info_tamper
+(
+	id int auto_increment
+		primary key,
+	domain varchar(255) null comment '网站地址',
+	website_id int not null comment '网站ID',
+	firm varchar(100) null comment '厂商',
+	device varchar(100) null comment '扫描设备',
+	happened_time datetime null comment '发生时间',
+	lasthappened_time datetime null,
+	url varchar(500) null comment '篡改页面',
+	level varchar(50) null comment '结果等级 低、中、高度变更，篡改',
+	hacked varchar(50) null comment '变更结果 变更、确认篡改',
+	category varchar(50) null comment '变更类别 新增、删除、修改',
+	status int null comment '1:待验证 2:验证不存在 3:待处理（验证存在） 4:处理中 5:待复核 6:已修复',
+	biz_status int null comment '业务流转状态 默认0',
+	create_date datetime null,
+	update_date datetime null,
+	smdw_id int not null comment '扫描单位id',
+	matchcode varchar(50) null
+)
+charset=utf8
+;
+
+create table info_trojan
+(
+	id int auto_increment
+		primary key,
+	domain varchar(255) null comment '网站url',
+	website_id int not null comment '网站id',
+	firm varchar(100) null comment '厂商',
+	device varchar(100) null comment '扫描设备',
+	happened_time datetime null comment '发生时间',
+	lasthappened_time datetime null,
+	url varchar(1000) null comment '挂马页面',
+	source_url varchar(1000) null comment '恶意源 url',
+	type varchar(500) null comment '挂马类型',
+	level varchar(50) null comment '危害等级 低危，中危，高危',
+	status int null comment '1:待验证 2:验证不存在 3:待处理（验证存在） 4:处理中 5:待复核 6:已修复',
+	biz_status int null comment '业务流转状态 默认0',
+	create_date datetime null,
+	update_date datetime null,
+	smdw_id int not null comment '扫描单位id',
+	matchcode varchar(50) null
+)
+comment ' 木马表' charset=utf8
+;
+
+create table info_usability
+(
+	us_id int auto_increment
+		primary key,
+	us_domain varchar(255) not null comment '网站域名',
+	us_website_id int null comment '网站ID',
+	us_firm varchar(100) not null comment '厂商',
+	us_device varchar(100) not null comment '扫描设备',
+	us_happened_time datetime not null comment '发生时间',
+	us_finshed_time datetime null comment '修复时间',
+	us_status int not null comment '可用性状态',
+	us_biz_status int null comment '业务状态',
+	us_description varchar(3000) null comment '原因',
+	us_create_date datetime not null comment '创建时间',
+	us_update_date datetime null comment '修改时间',
+	smdw_id int null comment '扫描单位id'
+)
+comment '可用性表' charset=utf8
+;
+
+create table info_vulnerability
+(
+	vul_id int auto_increment
+		primary key,
+	vul_domain varchar(255) not null comment '网站域名',
+	website_id int null comment '网站基础信息ID',
+	vul_firm varchar(100) not null comment '漏扫厂商',
+	vul_device varchar(100) not null comment '扫描设备ID',
+	vul_happened_time datetime not null comment '第一次发生时间',
+	vul_lasthappened_time datetime not null comment '最近一次发生时间',
+	vul_create_date datetime not null comment '单据创建日期',
+	vul_update_date datetime null comment '单据更新日期',
+	vul_status int null comment '1、待验证
+2、验证不存在
+3、待处理（验证存在）
+4、处理中
+5、待复核
+6、已修复
+',
+	vul_biz_status int null comment '业务流转状态',
+	vul_url longtext not null comment '漏洞发生页面',
+	vul_name varchar(255) not null comment '漏洞名称',
+	vul_type varchar(255) not null comment '漏洞类型',
+	vul_danger_level varchar(300) not null comment '危害等级',
+	vul_description text not null comment '漏洞描述',
+	vul_suggest text null comment '修复建议',
+	vul_harm text null comment '漏洞危害',
+	vul_solve_date datetime null comment '修复时间',
+	vul_rectify_date datetime null comment '整改日期',
+	smdw_id int null comment '扫描单位id',
+	vul_matchcode varchar(50) null comment '漏洞地址、类型、名称合并md5码'
+)
+comment '漏洞表' charset=utf8
+;
+
+create table news_threat_info
+(
+	id int(11) unsigned auto_increment
+		primary key,
+	createDate datetime null,
+	modifyDate datetime null,
+	news_title varchar(255) null comment '标题',
+	news_abstract varchar(400) null comment '摘要',
+	news_content longtext null comment '内容(html文本)',
+	publishDate datetime null comment '发布时间'
+)
+charset=utf8
+;
+
+create table registries_deleted
+(
+	id int auto_increment
+		primary key,
+	value mediumtext null comment 'json数据',
+	type varchar(20) null comment '数据类型 web:网站，itware:信息系统，indus:工控系统',
+	deleted_by int null comment '删除人id',
+	delete_date datetime null comment '删除时间',
+	delete_reason varchar(1000) null comment '删除原因',
+	owner_id int null comment '业主单位id',
+	classified_level varchar(20) null comment '等保等级',
+	system_name varchar(255) null comment '系统名称'
+)
+comment '备案登记，历史数据' charset=utf8
+;
+
+create table registries_sys_code_dictionary
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	dicCode varchar(255) null comment '码表-代码',
+	dicName varchar(255) null comment '码表-名称',
+	dicType varchar(255) null comment '码表-分类 area,industry,web,relation,system',
+	remark varchar(500) null comment '码表-备注',
+	dicTypeDisplay varchar(255) null comment '码表-分类 辖区、行业、网站性质、隶属关系、系统类型',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间'
+)
+;
+
+create table scan_webvul_devices
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null,
+	modifyDate datetime null,
+	smdw_id int null comment '扫描单位id-账号id',
+	scan_type varchar(255) default 'web应用扫描' null comment '扫描类型:1-web应用扫描',
+	device_name varchar(255) null comment '设备名称',
+	device_addr varchar(255) null comment '设备ip端口',
+	device_isdel int(11) unsigned default '0' null comment '0没有删除 1为删除',
+	device_account varchar(255) null,
+	device_pwd varchar(255) null,
+	device_apitype int null comment '适配器程序类型 从QGScannerFactory里面获取',
+	device_enable int default '1' null comment '启用停用设备 0:停用 1启用'
+)
+comment 'web漏洞扫描 设备表' charset=utf8
+;
+
+create table scan_webvul_taskrecord
+(
+	id int auto_increment
+		primary key,
+	website_id int null comment '网站id',
+	smdw_id int null comment '扫描单位id',
+	device_id int null comment '设备id',
+	task_id varchar(255) null comment '设备上的任务id',
+	task_name varchar(255) null comment '任务名称',
+	task_type varchar(255) default 'web应用扫描' null comment '任务类型',
+	device_api_addr varchar(255) null comment '扫描设备的接口地址 用这个调用设备api',
+	scan_url varchar(255) null comment '扫描的网站url',
+	create_date datetime null comment '创建时间',
+	start_date datetime null comment '开始时间',
+	finish_date datetime null comment '结束时间',
+	status int null comment '状态: 0新建 1等待中 2扫描中 3 完成 -1错误',
+	isdel int default '0' null,
+	web_assign_num int null comment '第几次分配后的任务'
+)
+comment '网站 web应用扫描 任务记录' charset=utf8
+;
+
+create table sitaw_asset_homepagedata
+(
+	id int auto_increment
+		primary key,
+	paramName varchar(255) null comment '参数名',
+	paramValue longtext null comment '参数值',
+	paramType varchar(255) null comment '字段类型：value=普通值 json=json字符串',
+	constraint paramName
+		unique (paramName)
+)
+comment '态势感知 资产态势 数据' charset=utf8
+;
+
+create table sitaw_web_homepagedata
+(
+	id int auto_increment
+		primary key,
+	paramName varchar(255) null comment '参数名',
+	paramValue longtext null comment '参数值',
+	paramType varchar(255) null comment '字段类型：value=普通值 json=json字符串',
+	constraint paramName
+		unique (paramName)
+)
+comment '态势感知 网站态势 数据' charset=utf8
+;
+
+create table sp_protection_number
+(
+	number varchar(64) not null comment '等保备案号'
+		primary key,
+	object_id varchar(64) null comment '等保定级对象ID',
+	object_type varchar(64) null comment '等保定级对象类型, enum {it-ware, website}'
+)
+comment '等保备案号使用记录' charset=utf8
+;
+
+create table sp_website
+(
+	id int auto_increment comment 'ID'
+		primary key,
+	owner_id int not null comment '所属业主单位ID,即sys_dept.id',
+	area_id int null comment '区域ID',
+	supervised_by int null comment '行业主管ID',
+	status int null comment '状态：0=>新建, 1=>提交, 2=>审核通过, 4=>审核不通过（退回）',
+	name varchar(50) not null comment '网站名称',
+	name_pinyin varchar(256) null comment '网站名称的拼音',
+	ip varchar(30) not null comment 'IP地址',
+	domain_name varchar(64) not null comment '域名',
+	is_online bit null comment '状态：`true` => 正常, `false` => 下线',
+	server_os varchar(64) null comment '服务器操作系统',
+	address varchar(64) null comment '网站所在地',
+	classified_level varchar(32) not null comment '等级保护定级: level-0=>未定级, level-1~5 =>一级~五级',
+	certificated bit null comment '等级测评: `true`=>已开展, `false`=>未开展',
+	submitted_by int null comment '上报人ID',
+	submitted_at datetime null comment '上报时间',
+	checked_by int null comment '自查人ID',
+	checked_at datetime null comment '自查时间',
+	created_by int not null comment '创建人',
+	created_at datetime not null comment '创建时间',
+	safety_contract_signed bit default b'0' null comment '是否已签订安全责任书: true|1 => 是, false|0=否',
+	constraint uk_name
+		unique (name)
+)
+comment '等级保护::网站::基本信息' charset=utf8
+;
+
+create table sp_website_icp
+(
+	id int auto_increment comment 'ID'
+		primary key,
+	website_id int not null comment '网站ID',
+	china_icp_code varchar(32) not null comment '工信部ICP备案号',
+	international_icp_code varchar(64) not null comment '国际联网备案号',
+	ip_range varchar(128) not null comment '主站IP地址范围',
+	protocol varchar(24) null comment '主要协议',
+	port varchar(5) null comment '主要端口',
+	dns_name varchar(64) not null comment '域名注册服务机构::名称',
+	dns_contact varchar(128) not null comment '域名注册服务机构::联系方式',
+	dns_record_ns varchar(64) not null comment '.cn域名的NS记录',
+	dns_record_a varchar(64) not null comment '.cn域名的A记录',
+	isp_name varchar(64) not null comment '接入运营商::名称',
+	isp_contact varchar(128) not null comment '接入运营商::联系方式',
+	isp_address varchar(128) not null comment '物理接入位置',
+	isp_bandwidth varchar(12) not null comment '接入带宽',
+	cdn_name varchar(64) not null comment 'CDN 服务提供商',
+	cdn_ip_range varchar(128) not null comment 'CDN IP地址范围',
+	cdn_contact_name varchar(64) not null comment 'CDN 联系人姓名',
+	cdn_contact_mobile varchar(32) not null comment 'CDN 联系人手机号',
+	constraint uk_cn_icp
+		unique (china_icp_code),
+	constraint uk_i18n_icp
+		unique (international_icp_code)
+)
+comment '等级保护::网站::ICP备案信息' charset=utf8
+;
+
+create table sp_website_service_item
+(
+	id int auto_increment comment 'ID'
+		primary key,
+	name varchar(24) not null comment '服务名称',
+	website_id int not null comment '所属网站ID',
+	code varchar(36) not null comment '服务栏目编码：系统定义栏目=>字典code, 自定义栏目=>other',
+	user_defined bit not null comment '是否自定义栏目'
+)
+comment '等及保护::网站::服务栏目' charset=utf8
+;
+
+create table sp_website_sponsor
+(
+	id int auto_increment comment 'ID'
+		primary key,
+	website_id int not null comment '网站ID',
+	owner_name varchar(64) not null comment '业主单位::名称',
+	operator_name varchar(64) not null comment '责任单位::名称',
+	operator_officer_name varchar(32) not null comment '责任单位::负责人::姓名',
+	operator_officer_title varchar(32) not null comment '责任单位::负责人::职务',
+	operator_officer_phone varchar(32) not null comment '责任单位::负责人::联系电话',
+	supporter_name varchar(64) not null comment '支撑单位::名称',
+	supporter_officer_name varchar(32) not null comment '支撑单位::责任人',
+	supporter_officer_title varchar(32) not null comment '支撑单位::职务',
+	supporter_officer_phone varchar(32) not null comment '支撑单位::联系电话'
+)
+comment '等及保护::网站::主办方信息' charset=utf8
+;
+
+create table sp_website_supervisor_level
+(
+	id int auto_increment comment 'ID'
+		primary key,
+	name varchar(24) not null comment '隶属关系名称',
+	website_id int not null comment '所属网站ID',
+	code varchar(36) not null comment '隶属关系编码：系统定义隶属关系=>字典code, 自定义隶属关系=>other',
+	user_defined bit not null comment '是否自定义隶属关系'
+)
+comment '等及保护::网站::隶属关系' charset=utf8
+;
+
+create table specialized_bill
+(
+	id int auto_increment comment '表id'
+		primary key,
+	deleted int default '0' null comment '是否删除，0：未删除，1：已删除',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间',
+	create_user_id int null comment '创建用户id',
+	modify_user_id int null comment '修改用户id',
+	bill_name varchar(100) null comment '通报单名称',
+	area_id int null comment '区域id',
+	industry_id int null comment '行业id',
+	owner_id int null comment '业主id',
+	contact_name varchar(20) null comment '联系人名称',
+	contact_phone varchar(20) null comment '联系人电话',
+	rectify_date datetime null comment '整改时限',
+	threat_source_id int null comment '威胁来源id',
+	threat_type_id int null comment '威胁类型id',
+	threat_level_id int null comment '威胁等级id',
+	happen_date datetime null comment '发现时间',
+	threat_description text null comment '威胁描述',
+	threat_name varchar(100) null comment '威胁名称',
+	police_attachment varchar(50) null comment '网警附件名称',
+	owner_attachment varchar(50) null comment '业主附件名称',
+	feedback_status varchar(20) null comment '反馈状态，create：待反馈，processed：已反馈，outdated：已过期',
+	feedback_user_id int null comment '反馈用户id',
+	feedback_date datetime null comment '反馈时间',
+	feedback_content text null comment '反馈内容',
+	bill_status varchar(20) null comment '完成状态，unfinished：未完成，finished：已完成'
+)
+comment '专项通报单' charset=utf8
+;
+
+create table stat_readinfo
+(
+	user_id int not null comment '用户id',
+	readitem_id int not null comment '已读的消息id',
+	readitem_table varchar(255) not null comment '已读消息是哪个表',
+	read_date datetime null comment '已读的时间',
+	primary key (user_id, readitem_id, readitem_table)
+)
+comment '消息的已读记录' charset=utf8
+;
+
+
+create table stt
+(
+	id bigint not null
+		primary key,
+	creator varchar(255) null comment '创建者',
+	dingGroup varchar(255) null comment '钉钉群',
+	dutyPlan bigint null comment '值班表',
+	gmtCreate datetime not null comment '创建时间',
+	gmtModified datetime not null comment '最后修改时间',
+	leaderId varchar(255) null comment '负责人',
+	leaderNick varchar(255) null comment '负责人昵称',
+	masterId varchar(255) null comment '管理员',
+	masterNick varchar(255) null comment '管理员昵称',
+	memberSource varchar(255) null comment '成员来源',
+	memberSourceDetail varchar(255) null comment '成员来源详情',
+	modifier varchar(255) null comment '最后修改者',
+	name varchar(255) null comment '名称',
+	slaId bigint null comment 'SLA ID',
+	status tinyint(1) null comment '状态',
+	type varchar(255) null comment '类型',
+	upgradePath varchar(255) null comment '升级路径',
+	upgradePolicy varchar(255) null comment '升级策略'
+)
+;
+
+create table sys_dept
+(
+	dept_id int auto_increment
+		primary key,
+	dept_name varchar(120) not null comment '部门名称',
+	dept_parent_id int not null comment '上级部门ID',
+	dept_code varchar(120) null comment '部门编码',
+	dept_search_code varchar(300) not null comment '查询码',
+	dept_search_code2 varchar(500) null comment 'id-id-id-自己id 优化查询码 后续部门筛选使用该查询码',
+	dept_py varchar(120) null comment '拼音缩写',
+	dept_wb varchar(120) null comment '五笔缩写',
+	dept_full_name varchar(600) not null comment '全路径',
+	dept_isdel int not null comment '是否删除',
+	dept_remark varchar(600) null comment '备注',
+	dept_create_date datetime not null comment '创建时间',
+	dept_update_date datetime null comment '修改时间',
+	dept_create_user int not null comment '创建人',
+	dept_update_user int null comment '修改人',
+	dept_type int null,
+	dept_area_id int null comment '区域id',
+	dept_industry_id int null comment '行业id'
+)
+comment '部门表' charset=utf8
+;
+
+
+create table sys_func
+(
+	func_id varchar(60) not null
+		primary key,
+	func_name varchar(120) not null comment '功能名称',
+	func_parent_id varchar(60) not null comment '上级功能ID',
+	func_search_code varchar(300) not null comment '查询码',
+	func_full_name varchar(600) not null comment '全路径',
+	func_sort int not null comment '排序号',
+	func_isdel int not null comment '是否删除',
+	func_py varchar(120) null comment '拼音缩写',
+	func_wb varchar(120) null comment '五笔缩写',
+	jsEvent varchar(120) null comment 'js事件',
+	actionEvent varchar(120) null comment '操作事件',
+	func_create_date datetime not null comment '创建时间',
+	func_update_date datetime null comment '修改时间',
+	func_create_user int not null comment '创建人',
+	func_update_user int null comment '修改人'
+)
+comment '功能表' charset=utf8
+;
+
+create table sys_log
+(
+	log_id int auto_increment
+		primary key,
+	log_type int not null comment '日志类型：1、操作日志',
+	log_content varchar(3000) not null comment '日志内容',
+	log_source varchar(100) not null comment '日志来源：1、web，2、android、3、ios',
+	log_ip varchar(1000) not null comment '来源ip',
+	log_time datetime not null comment '发生时间',
+	log_create_user varchar(100) not null comment '操作者'
+)
+comment '日志表' charset=utf8
+;
+
+create table sys_log_access
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	actTime datetime null comment '操作时间',
+	actUserAccount varchar(255) null comment '账号用户名',
+	actUserId int null comment '账号id',
+	actUserName varchar(255) null comment '账号姓名',
+	ip varchar(255) null comment '来源ip',
+	logType varchar(255) null comment '日志类型',
+	platform varchar(255) null comment '操作来源 PC Android iPhone',
+	userAreaName varchar(255) null comment '账号所属区域',
+	userDeptName varchar(255) null comment '账号所属部门 网警/业主就是dept 行业主管扫描验证单位就是自己',
+	userIndustryName varchar(255) null comment '账号所属行业',
+	accessTarget varchar(1000) null comment '访问的应用模块 xxx->xxx->xxx',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间'
+)
+;
+
+create table sys_log_login
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	actTime datetime null comment '操作时间',
+	actUserAccount varchar(255) null comment '账号用户名',
+	actUserId int null comment '账号id',
+	actUserName varchar(255) null comment '账号姓名',
+	ip varchar(255) null comment '来源ip',
+	logType varchar(255) null comment '日志类型',
+	platform varchar(255) null comment '操作来源 PC Android iPhone',
+	userAreaName varchar(255) null comment '账号所属区域',
+	userDeptName varchar(255) null comment '账号所属部门 网警/业主就是dept 行业主管扫描验证单位就是自己',
+	userIndustryName varchar(255) null comment '账号所属行业',
+	loginType varchar(255) null comment '登录方式 口令',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间'
+)
+;
+
+create table sys_log_operate
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	actTime datetime null comment '操作时间',
+	actUserAccount varchar(255) null comment '账号用户名',
+	actUserId int null comment '账号id',
+	actUserName varchar(255) null comment '账号姓名',
+	ip varchar(255) null comment '来源ip',
+	logType varchar(255) null comment '日志类型',
+	platform varchar(255) null comment '操作来源 PC Android iPhone',
+	userAreaName varchar(255) null comment '账号所属区域',
+	userDeptName varchar(255) null comment '账号所属部门 网警/业主就是dept 行业主管扫描验证单位就是自己',
+	userIndustryName varchar(255) null comment '账号所属行业',
+	operateContent varchar(1000) null comment '操作内容 xxx修改了xxx',
+	operateType varchar(255) null comment '操作类型 新增 编辑 删除',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间'
+)
+;
+
+create table sys_menu
+(
+	menu_id varchar(60) not null,
+	menu_name varchar(120) not null comment '菜单名称',
+	menu_parent_id varchar(60) not null comment '上级菜单id',
+	menu_search_code varchar(300) not null comment '查询码',
+	menu_full_name varchar(600) not null comment '全路径',
+	menu_url varchar(300) not null comment '菜单url',
+	menu_sort int not null comment '排序号',
+	menu_isdel int not null comment '是否删除',
+	menu_py varchar(120) null comment '拼音缩写',
+	menu_wb varchar(120) null comment '五笔缩写',
+	icon varchar(120) null comment '图标',
+	menu_create_date datetime not null comment '创建时间',
+	menu_update_date datetime null comment '修改时间',
+	menu_create_user int not null comment '创建人',
+	menu_update_user int null comment '修改人',
+	primary key (menu_id, menu_isdel)
+)
+comment '菜单表' charset=utf8
+;
+
+create table sys_mobile_sms_code
+(
+	phoneNum varchar(20) not null,
+	createDate datetime not null on update CURRENT_TIMESTAMP,
+	expireDate datetime not null on update CURRENT_TIMESTAMP,
+	smsCode varchar(255) not null
+)
+charset=utf8
+;
+
+create table sys_param
+(
+	param_id int auto_increment
+		primary key,
+	param_key varchar(100) null comment 'key',
+	param_value varchar(300) null comment 'value',
+	param_remark varchar(1000) null comment '备注',
+	param_type int null comment '参数类型',
+	constraint param_key
+		unique (param_key)
+)
+comment '系统参数表' charset=utf8
+;
+
+create table sys_role
+(
+	role_id int auto_increment
+		primary key,
+	role_type int not null comment '角色类型',
+	role_name varchar(120) not null comment '角色名称',
+	role_isdel int not null comment '是否删除',
+	role_py varchar(120) null comment '拼音缩写',
+	role_wb varchar(120) null comment '五笔缩写',
+	role_remark varchar(600) null comment '备注',
+	role_create_date datetime not null comment '创建时间',
+	role_update_date datetime null comment '修改时间',
+	role_create_user int not null comment '创建人',
+	role_update_user int null comment '修改人'
+)
+comment '角色表' charset=utf8
+;
+
+create table sys_role_func
+(
+	id int auto_increment
+		primary key,
+	role_id int not null comment '角色id',
+	func_id varchar(60) not null comment '功能id'
+)
+comment '角色功能表' charset=utf8
+;
+
+create table sys_role_menu
+(
+	id int auto_increment
+		primary key,
+	role_id int not null comment '角色id',
+	menu_id varchar(60) not null comment '菜单id'
+)
+comment '角色菜单表' charset=utf8
+;
+
+create table sys_user
+(
+	user_id int auto_increment
+		primary key,
+	user_account varchar(120) not null comment '账号',
+	user_pswd varchar(120) not null comment '密码',
+	user_dept_id int not null comment '归属部门id',
+	user_code varchar(120) null comment '用户编码',
+	user_name varchar(120) not null comment '姓名',
+	user_sex int null comment '性别 1：男，0：女',
+	user_phone varchar(20) null comment '联系电话',
+	user_type int null comment '用户类型',
+	user_mail varchar(60) null comment '邮箱',
+	user_isdel int not null comment '是否删除',
+	user_py varchar(120) null comment '拼音缩写',
+	user_wb varchar(120) null comment '五笔缩写',
+	user_remark varchar(600) null comment '备注',
+	user_create_date datetime not null comment '创建时间',
+	user_update_date datetime null comment '修改时间',
+	user_create_user int not null comment '创建人',
+	user_update_user int null comment '修改人'
+)
+comment '用户表' charset=utf8
+;
+
+create table sys_user_pms
+(
+	id int auto_increment
+		primary key,
+	user_id int not null comment '用户id',
+	pms_id varchar(60) not null comment '权限id',
+	type int not null comment '权限类型 1：部门 2：行业 3：区域'
+)
+charset=utf8
+;
+
+create table sys_user_role
+(
+	id int auto_increment
+		primary key,
+	user_id int not null comment '用户id',
+	role_id int not null comment '角色id'
+)
+comment '用户角色表' charset=utf8
+;
+
+create table threat_level
+(
+	id int auto_increment comment '表id'
+		primary key,
+	level varchar(20) null comment '威胁等级'
+)
+comment '专项通报，威胁等级' charset=utf8
+;
+
+create table threat_source
+(
+	id int auto_increment comment '表id'
+		primary key,
+	source varchar(100) null comment '威胁来源'
+)
+comment '专项通报，威胁情报来源' charset=utf8
+;
+
+create table threat_type
+(
+	id int auto_increment comment '表id'
+		primary key,
+	type varchar(20) null comment '威胁类型'
+)
+comment '专项通报，威胁类型' charset=utf8
+;
+
+create table user_register
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	area_dept_id int null comment '区域id',
+	industry_dept_id int null comment '行业id',
+	user_account varchar(255) null comment '账号',
+	user_dept_name varchar(255) null comment '部门名称',
+	user_mail varchar(255) null comment '邮箱',
+	user_name varchar(255) null comment '姓名',
+	user_phone varchar(255) null comment '手机',
+	user_pswd varchar(255) null comment '密码',
+	reject_reason text null comment '驳回原因 前端自己装配',
+	status varchar(255) null comment '审批状态',
+	reject_params text null comment '驳回字段 属性名称 逗号隔开',
+	create_date datetime null comment '创建时间',
+	modify_date datetime null comment '修改时间'
+)
+;
+
+create table vulnotify_bill
+(
+	id int auto_increment
+		primary key,
+	source varchar(255) null comment '来源 网安总队/网安支队/部网安局',
+	vulinfo varchar(255) null comment '漏洞信息',
+	vulgrade varchar(255) null comment '漏洞等级 高危/中危/低危',
+	area varchar(255) null comment '属地/数据发到哪个区',
+	webname varchar(255) null comment '单位名称',
+	weburl varchar(255) null comment '单位网址',
+	createDate datetime null comment '发布的时间',
+	fixDate datetime null comment '整改时间',
+	dateLimit datetime null comment '整改时限',
+	notify_detail_file varchar(255) null comment '通报详情-文件名',
+	fix_detail_file varchar(255) null comment '整改详情-文件名',
+	isOutDated int null comment '是否超期 0/1 不是/是',
+	isFixed int default '-1' null comment '初始状态是-1，是否已反馈 0/1 否/是'
+)
+comment '漏洞通报 - 通报单' charset=utf8
+;
+
+create table vulnotify_vul
+(
+	id int auto_increment comment '表id 自增'
+		primary key,
+	source varchar(255) null comment '来源 网安总队/网安支队/部网安局',
+	vulinfo varchar(255) null comment '漏洞信息',
+	vulgrade varchar(255) null comment '漏洞等级 高危/中危/低危',
+	dept_name varchar(255) null comment '单位名称',
+	web_url varchar(255) null comment '单位网站'
+)
+comment '漏洞通报 - 漏洞信息' charset=utf8
+;
+
+create table zeroreport
+(
+	id int auto_increment
+		primary key,
+	name varchar(255) null comment '事件名称',
+	start_date datetime null comment '开始时间',
+	end_date datetime null comment '结束时间',
+	frequency int null comment '频率 几小时一次',
+	area_id int null comment '区域id',
+	industry_id int null comment '行业id 指定那个行业发起事件 null表示全部行业',
+	status varchar(255) null comment '状态值 create：新建，running：进行中，not-summarize：未总结，finished：事件结束',
+	create_user_id int null comment '发起人id',
+	summary text null comment '总结',
+	attachment varchar(255) null comment '附件下载地址',
+	owner_ids longtext null comment '直接指定业主单位 逗号隔开 null表示不直接指定',
+	emergency_att varchar(255) null comment '应急预案附件名称',
+	description text null comment '零报告事件描述',
+	create_date datetime null comment '发布时间'
+)
+comment '零报告活动表' charset=utf8
+;
+
+create table zeroreport_contact
+(
+	id int auto_increment
+		primary key,
+	owner_id int null comment '业主单位id',
+	leader_name varchar(255) null comment '领导姓名',
+	leader_phone varchar(255) null comment '领导电话',
+	contact_1_name varchar(255) null,
+	contact_1_phone varchar(255) null,
+	contact_2_name varchar(255) null,
+	contact_2_phone varchar(255) null,
+	contact_3_name varchar(255) null,
+	contact_3_phone varchar(255) null,
+	contact_4_name varchar(255) null,
+	contact_4_phone varchar(255) null,
+	contact_5_name varchar(255) null,
+	contact_5_phone varchar(255) null,
+	constraint owner_id
+		unique (owner_id)
+)
+comment '零报告联系人表' charset=utf8
+;
+
+create table zeroreport_feedback_statistics
+(
+	id int auto_increment
+		primary key,
+	feedback_status varchar(255) null comment '反馈状态',
+	owner_id int null comment '业主单位id',
+	statistics_date datetime null comment '统计时间',
+	system_status varchar(255) null comment '系统状态',
+	zeroreport_id int null comment '零报告事件id'
+)
+;
+
+create table zeroreport_statistics
+(
+	id int auto_increment
+		primary key,
+	createDate datetime null comment '创建时间',
+	modifyDate datetime null comment '修改时间',
+	statistics_content mediumtext null,
+	timelast bigint null,
+	zeroreport_id int not null comment 'zeroreport表的id',
+	constraint zeroreport_id
+		unique (zeroreport_id)
+)
+;
+
+create table zeroreport_task
+(
+	id int auto_increment
+		primary key,
+	zeroreport_id int null comment '零报告事件id',
+	owner_id int null comment '业主单位id',
+	system_status varchar(255) null comment '运行状态（good：正常，error：异常）',
+	system_description text null comment '情况描述',
+	contact_name varchar(255) null comment '联系人姓名',
+	contact_phone varchar(255) null comment '联系人电话',
+	create_time datetime null comment '任务创建时间',
+	feedback_time datetime null comment '反馈时间',
+	status varchar(255) null comment '状态值（create：创建，processed：已反馈，outdated：已过期）'
+)
+comment '零报告任务表' charset=utf8
+;
+
+create table zeroreport_task_detail
+(
+	id int auto_increment
+		primary key,
+	zeroreport_task_id int null comment '任务id',
+	zeroreport_id int null comment '零报告事件id',
+	owner_id int null comment '业主单位id',
+	system_status varchar(255) null comment '运行状态（good：正常，error：异常）',
+	system_description text null comment '情况描述',
+	contact_name varchar(255) null comment '联系人姓名',
+	contact_phone varchar(255) null comment '联系人电话',
+	create_time datetime null comment '任务创建时间',
+	feedback_time datetime null comment '反馈时间',
+	status varchar(255) null comment '状态值（create：创建，processed：已反馈，outdated：已过期）'
+)
+comment '零报告业主每次通报明细' charset=utf8
+;
+
