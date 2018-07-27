@@ -42,14 +42,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
-  profiles:
-    active: local
-
 
 redis:
   host: 10.211.55.3
   port: 6379
-
-#test
-connection:
-  maxActive: 300

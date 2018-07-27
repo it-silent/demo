@@ -24,10 +24,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cglib.beans.BeanCopier;
-import org.springframework.http.HttpHeaders;
+import org.springframework.cglib.beans.BeanMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
+import org.yaml.snakeyaml.Yaml;
 import redis.clients.jedis.Jedis;
 
 import java.io.*;
@@ -56,11 +57,25 @@ public class MainTest {
 
     private static final Pattern p = Pattern.compile("\\<dd class\\=\"fz24\">(.*?)\\<\\/dd>");
 
-    private static final String REDIS_HOST = "10.211.55.3";
+    private static String REDIS_HOST ;
 
-    private static final int REDIS_PORT = 6379;
+    private static int REDIS_PORT ;
 
     private static final String GET_IP_URL = "http://ip.chinaz.com/getip.aspx";
+
+    static {
+        String pathname = System.getProperty("user.dir") + "/demo-start/src/main/resources/application-local.yml";
+        try (FileInputStream inputStream = new FileInputStream(new File(pathname))) {
+            Yaml yaml = new Yaml();
+            Map map = yaml.loadAs(inputStream, Map.class);
+            Map<String, Object> redis = (Map<String, Object>) map.get("redis");
+            REDIS_HOST = redis.get("host").toString();
+            REDIS_PORT = Integer.valueOf(redis.get("port").toString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     public static void main(String[] args) {
         try {
@@ -95,12 +110,7 @@ public class MainTest {
 
 //            readValueAsList();
 
-            UserDO user = new UserDO();
-            user.setName("user-1");
-            user.setEmail("xxx");
-            Map<String, Object> describe = PropertyUtils.describe(user);
-            Map<String, String> describe1 = org.apache.commons.beanutils.BeanUtils.describe(user);
-            HashMap<String, Object> target = new HashMap<>();
+            String userDir = System.getProperty("user.dir");
             System.err.println();
         } catch (Exception e) {
             System.err.println(e);
