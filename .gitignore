@@ -1,7 +1,28 @@
-*.iml
-.idea
-*/target
-.mvn/
-mvnw
-mvnw.cmd
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
 book.md
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+application.pid
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+data/
+maven-repo/
