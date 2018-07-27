@@ -2,13 +2,12 @@ package com.hy.demo.controller;
 
 import com.hy.demo.common.CommonResult;
 import com.hy.demo.controller.base.BaseController;
+import com.hy.demo.dal.dataobject.SttDO;
 import com.hy.demo.service.stt.SttService;
 import com.hy.demo.utils.WebUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 
@@ -39,5 +38,11 @@ public class SttController extends BaseController {
             }
         }
         return CommonResult.success(sttService.findAll(), cookieValue);
+    }
+
+    @PostMapping(path = "/save")
+    public CommonResult save(@RequestBody SttDO sttDO) {
+        sttService.create(sttDO.getCreator(), sttDO.getName(), sttDO.getLeaderId(), sttDO.getMasterId());
+        return CommonResult.success();
     }
 }

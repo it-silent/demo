@@ -1,5 +1,6 @@
 package com.hy.demo.service.stt.impl;
 
+import com.hy.demo.common.enums.StatusEnum;
 import com.hy.demo.common.utils.ExecutorUtils;
 import com.hy.demo.dal.repositories.SttDORepository;
 import com.hy.demo.dal.dataobject.SttDO;
@@ -33,19 +34,19 @@ public class SttServiceImpl implements SttService {
 
 
     @Override
-    public Long create(String creator, String name, String leaderId, String masterId, Integer status) {
+    public Long create(String creator, String name, String leaderId, String masterId) {
         SttDO sttDO = new SttDO();
         sttDO.setGmtCreate(new Date());
         sttDO.setGmtModified(new Date());
         sttDO.setCreator(creator);
         sttDO.setModifier(creator);
-        sttDO.setStatus(status);
         sttDO.setName(name);
         sttDO.setType("type");
         sttDO.setLeaderId(leaderId);
         sttDO.setLeaderNick(leaderId);
         sttDO.setMasterId(masterId);
         sttDO.setMasterNick(masterId);
+        sttDO.setStatus(StatusEnum.NORMAL.value);
         sttDORepository.save(sttDO);
         return sttDO.getId();
     }

@@ -13,9 +13,9 @@ import java.util.List;
  */
 public interface SttService {
 
-    Long create(String creator, String name, String leaderId, String masterId, Integer status);
+    Long create(String creator, String name, String leaderId, String masterId);
 
-    List<SttDO> findAll();
+    List<SttDO>findAll();
 
     SttDO findById(Long id);
 
